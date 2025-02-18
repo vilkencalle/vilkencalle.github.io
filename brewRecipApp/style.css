@@ -1,0 +1,128 @@
+body {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #2e2e2e;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+h1, h2 {
+    color: #ffffff;
+    text-align: center;
+}
+
+.input-group {
+    margin-bottom: 15px;
+    margin-right: 20px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #ffffff;
+}
+
+.input-group input, .input-group select {
+    width: 100%;
+    max-width: 100%;
+    padding: 10px;
+    border: 1px solid #ffffff;
+    border-radius: 5px;
+    background-color: #3e3e3e;
+    color: #e0e0e0;
+    margin: 0 auto;
+}
+
+.input-group input:disabled {
+    background-color: #4e4e4e;
+}
+
+button {
+    display: inline-block;
+    padding: 10px 20px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #ffffff;
+    color: #1e1e1e;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin: 0 auto;
+    display: block;
+}
+
+button:hover {
+    background-color: #00cc99;
+}
+
+.button-container {
+    display: inline-flex;
+    justify-content: flex-end;
+    gap: 10px; /* Adjust the gap between buttons as needed */
+}
+
+.recipe {
+    background-color: #3e3e3e;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: 1px solid #ffffff;
+}
+
+.recipe h3 {
+    margin: 0;
+    color: #ffffff;
+}
+
+.recipe p {
+    margin: 5px 0;
+}
+
+.recipe button {
+    margin-right: 10px;
+    margin-top: 10px;
+}
+
+.flex-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.flex-item {
+    flex: 1;
+    margin: 10px;
+    padding: 20px;
+    background-color: #3e3e3e;
+    border: 1px solid #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    text-align: left;
+}
+
+#grain_additions, #hop_additions {
+    margin-top: 15px;
+}
+
+#grain_additions p, #hop_additions p {
+    margin: 5px 0;
+    padding: 10px;
+    background-color: #4e4e4e;
+    border: 1px solid #00ffcc;
+    border-radius: 5px;
+    text-align: left;
+}
+
+#saved_recipes {
+    margin-top: 20px;
+}
