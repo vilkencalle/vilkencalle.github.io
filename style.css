@@ -71,6 +71,16 @@ button:hover {
     gap: 10px; /* Adjust the gap between buttons as needed */
 }
 
+#grain_additions button, #hop_additions button {
+    margin-right: 10px;
+    margin-top: 20px;
+}
+
+#grain_additions button:hover, #hop_additions button:hover {
+    background-color: #ff0000;
+    color: #ffffff;
+}
+
 .recipe {
     background-color: #3e3e3e;
     padding: 10px;
