@@ -252,8 +252,8 @@ function saveRecipe() {
   const recipe = {
     name: document.querySelector('#beer_name').value,
     style: document.querySelector('#beer_style').value,
-    master: document.querySelector('#brew_master').value,
     date: document.querySelector('#brew_date').value,
+    master: document.querySelector('#brew_master').value,
     water: document.querySelector('#water').value,
     mashTemp: document.querySelector('#mash_temp').value,
     mashTime: document.querySelector('#mash_time').value,
