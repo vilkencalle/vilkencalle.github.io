@@ -278,14 +278,14 @@ function renderRecipes() {
       <p>Brew Date: ${recipe.date}</p>
       <p>OG: ${recipe.og}, FG: ${recipe.fg}, ABV: ${recipe.abv}, IBU: ${recipe.ibu}</p>
       <div class="button-container">
-        <button onclick="editRecipe(${index})">Edit</button>
+        <button onclick="viewRecipe(${index})">View</button>
         <button onclick="deleteRecipe(${index})">Delete</button>
       </div>
     </div>`;
   }).join('');
 }
 
-function editRecipe(index) {
+function viewRecipe(index) {
   const recipe = recipes[index];
   document.querySelector('#beer_name').value = recipe.name;
   document.querySelector('#beer_style').value = recipe.style;
