@@ -114,6 +114,11 @@ button:hover {
     margin-top: 15px;
 }
 
+.hop_additions-container {
+    display: flex;
+    justify-content: space-between;
+}
+
 #grain_additions p, #hop_additions p {
     margin: 5px 0;
     padding: 10px;
