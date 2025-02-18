@@ -10,6 +10,7 @@
   <h1>Beer Recipe Builder</h1>
 
   <div class="flex-container">
+    <h4>Beer info</h4>
     <div class="flex-item">
       <div class="input-group">
         <label for="beer_name">Beer Name:</label>
@@ -41,6 +42,7 @@
   </div>
 
   <div class="flex-container">
+    <h4>Brew stats</h4>
     <div class="flex-item">
       <div class="input-group">
         <label for="water">Pre-boil Vol (litres):</label>
@@ -85,9 +87,9 @@
     </div>
   </div>
 
-  <div class="flex-container">
-    <div class="flex-item">
-      <h2>Grain Additions</h2>
+  <div class="addition_flex-container">
+    <div class="addition_flex-item">
+      <h2>Grain Addition</h2>
       <div class="input-group">
         <label for="malt">Weight of Grain (kg):</label>
         <input type="number" id="malt" step="0.1" min="0">
@@ -115,10 +117,10 @@
       <div id="grain_additions"></div>
     </div>
 
-    <div class="flex-item">
+    <div class="addition_flex-item">
       <h2>Hop Additions</h2>
       <div class="input-group">
-        <label for="hop_variety">Hop:</label>
+        <label for="hop_variety">Hop Variety:</label>
         <select id="hop_variety" onchange="updateAlphaAcid()">
           <option value="Cascade" data-alpha="5.5">Cascade</option>
           <option value="Centennial" data-alpha="10.0">Centennial</option>
@@ -147,7 +149,7 @@
           <label for="boil_time">Boil time:</label>
           <input type="number" id="boil_time">
         </div>
-      </div>  
+      </div>
       <button onclick="addHopAddition()">Add Hop Addition</button>
       <div id="hop_additions"></div>
     </div>
