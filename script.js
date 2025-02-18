@@ -6,7 +6,7 @@ document.querySelector('#grams_of_hops').addEventListener('input', calculateOG);
 document.querySelector('#alpha_acid').addEventListener('input', calculateOG);
 document.querySelector('#boil_time').addEventListener('input', calculateOG);
 document.querySelector('#hop_form').addEventListener('change', calculateOG);
-document.querySelector('#gravity').addEventListener('input', () => {
+document.querySelector('#gravity').addEventListener('change', () => {
   calculateIBU();
   calculateABV();
 });
