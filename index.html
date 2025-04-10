@@ -1,96 +1,61 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-  <meta charset="UTF-8">
-  <title>🍺 Mina Recept</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      padding: 2em;
-      background: #fdfdfd;
-    }
-    h1 {
-      color: #6b4e2f;
-    }
-    .recipe {
-      border-bottom: 1px solid #ddd;
-      margin-bottom: 1em;
-      padding-bottom: 1em;
-    }
-    .recipe h2 {
-      margin: 0 0 0.3em;
-    }
-    .ebc-circle {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      margin-right: 6px;
-      vertical-align: middle;
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Receptformulär</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>🍺 Mina sparade recept</h1>
-  <div id="recipes">Laddar...</div>
 
-  <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbztPwpS1LkIfKfAi3TlnQXDaHgewtGe--tQ3jjJZIlv0W0k33YTNyUqx42YpdJhupU/exec"; // ← klistra in din apps script web app URL här
+  <div class="container">
+    <h1>🍺 Nytt Recept</h1>
 
-    function ebcToColor(ebc) {
-      if (ebc <= 2) return "#f8f753";
-      if (ebc <= 4) return "#f6f513";
-      if (ebc <= 6) return "#f3f513";
-      if (ebc <= 8) return "#eae615";
-      if (ebc <= 10) return "#e0d01b";
-      if (ebc <= 12) return "#d5bc26";
-      if (ebc <= 14) return "#c49a35";
-      if (ebc <= 16) return "#bf923b";
-      if (ebc <= 18) return "#a36f2c";
-      if (ebc <= 20) return "#945f27";
-      if (ebc <= 22) return "#813c1c";
-      if (ebc <= 24) return "#6b2e1a";
-      if (ebc <= 26) return "#5d1e13";
-      if (ebc <= 28) return "#4e1712";
-      if (ebc <= 30) return "#3b0b0a";
-      if (ebc <= 32) return "#2e0a0a";
-      if (ebc <= 34) return "#1f0707";
-      if (ebc <= 36) return "#1b0a07";
-      if (ebc <= 38) return "#140707";
-      if (ebc <= 40) return "#100505";
-      if (ebc <= 45) return "#0d0404";
-      if (ebc <= 50) return "#0a0303";
-      if (ebc <= 60) return "#060202";
-      return "#000000";
-    }
+    <!-- 🧾 INFO -->
+    <section>
+      <h2>Info</h2>
+      <label>Beer Name <input type="text" id="beerName" /></label>
+      <label>Beer Style
+        <select id="beerStyle">
+          <option value="">-- Välj stil --</option>
+          <option value="IPA">IPA</option>
+          <option value="Lager">Lager</option>
+          <option value="Stout">Stout</option>
+        </select>
+      </label>
+      <label>Brew Master <input type="text" id="brewMaster" /></label>
+      <label>Brew Date <input type="date" id="brewDate" /></label>
 
-    fetch(API_URL)
-      .then(res => res.json())
-      .then(data => {
-        const container = document.getElementById("recipes");
-        container.innerHTML = "";
+      <label>Pre-Boil Volume (L) <input type="number" id="preBoilVol" /></label>
+      <label>OG <input type="number" step="0.001" id="og" /></label>
+      <label>FG <input type="number" step="0.001" id="fg" /></label>
 
-        data.forEach(recipe => {
-          const div = document.createElement("div");
-          div.className = "recipe";
+      <label>IBU <input type="text" id="ibu" readonly /></label>
+      <label>EBC <input type="text" id="ebc" readonly /></label>
+      <label>ABV <input type="text" id="abv" readonly /></label>
+    </section>
 
-          const circle = `<span class="ebc-circle" style="background:${ebcToColor(recipe.ebc)};"></span>`;
+    <!-- 🔥 METHOD & TIMINGS -->
+    <section>
+      <h2>Method & Timings</h2>
 
-          div.innerHTML = `
-            <h2>${circle}${recipe.name}</h2>
-            <p><strong>Stil:</strong> ${recipe.style || "–"}</p>
-            <p><strong>ABV:</strong> ${recipe.abv || "?"}%</p>
-            <p><strong>IBU:</strong> ${recipe.ibu || "?"}</p>
-            <p><strong>EBC:</strong> ${recipe.ebc || "?"}</p>
-          `;
+      <h3>Temperatures</h3>
+      <label>Mash Temp (°C) <input type="number" id="mashTemp" /></label>
+      <label>Fermentation Temp (°C) <input type="number" id="fermTemp" /></label>
 
-          container.appendChild(div);
-        });
-      })
-      .catch(err => {
-        document.getElementById("recipes").textContent = "Kunde inte hämta recept 😢";
-        console.error(err);
-      });
-  </script>
+      <h3>Liquids</h3>
+      <label>Mash Liquid Volume (L) <input type="number" id="mashVol" /></label>
+      <label>Liquid/Mash Ratio <input type="text" id="mashRatio" readonly /></label>
+
+      <h3>Timings</h3>
+      <label>Mash (min) <input type="number" id="mashTime" /></label>
+      <label>Boil (min) <input type="number" id="boilTime" /></label>
+    </section>
+
+    <!-- 🔘 Spara-knapp -->
+    <button onclick="submitRecipe()">💾 Spara recept</button>
+  </div>
+
+  <script src="app.js"></script>
 </body>
 </html>
