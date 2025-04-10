@@ -82,6 +82,10 @@ function addHop(name = "", weight = "", aa = "", boilTime = "") {
   time.placeholder = "min";
   time.value = boilTime;
 
+  g.oninput = calculateIBU;
+  alpha.oninput = calculateIBU;
+  time.oninput = calculateIBU;
+
   row.appendChild(select);
   row.appendChild(g);
   row.appendChild(alpha);
