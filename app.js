@@ -43,7 +43,10 @@ function addMalt(name = "", weight = "") {
   percent.className = "percent";
   percent.textContent = "–";
 
-  input.oninput = updateMaltPercentages;
+  input.oninput = () => {
+    updateMaltPercentages();
+    calculateEBC();
+  };
 
   row.appendChild(select);
   row.appendChild(input);
