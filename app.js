@@ -1,6 +1,13 @@
 const availableMalts = ["Pilsner", "Vienna", "Caramel", "Chocolate"];
 const availableHops = ["Cascade", "Saaz", "Citra", "Simcoe"];
 
+const maltColorMap = {
+  "Pilsner": 3,
+  "Vienna": 6,
+  "Caramel": 20,
+  "Chocolate": 800
+};
+
 document.getElementById("og").addEventListener("input", () => {
   calculateABV();
   calculateIBU();
