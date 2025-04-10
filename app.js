@@ -123,13 +123,19 @@ function calculateABV() {
   const fg = parseFloat(document.getElementById("fg").value);
 
   const display = document.getElementById("abvDisplay");
+  const abvField = document.getElementById("abv");
+
   if (!isNaN(og) && !isNaN(fg)) {
     const abv = ((og - fg) * 131.25).toFixed(2);
     display.textContent = `ABV: ${abv}%`;
+
+    if (abvField) abvField.value = abv; // Uppdatera fältvärde
   } else {
     display.textContent = "ABV: –";
+    if (abvField) abvField.value = "";
   }
 }
+
 
 function calculateEBC() {
   const rows = document.querySelectorAll("#malts .ingredient-row");
