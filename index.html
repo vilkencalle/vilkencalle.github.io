@@ -1,165 +1,96 @@
 <!DOCTYPE html>
-<html>
+<html lang="sv">
 <head>
-    <meta charset="utf-8">
-    <title>Beer Recipe Builder</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>🍺 Mina Recept</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2em;
+      background: #fdfdfd;
+    }
+    h1 {
+      color: #6b4e2f;
+    }
+    .recipe {
+      border-bottom: 1px solid #ddd;
+      margin-bottom: 1em;
+      padding-bottom: 1em;
+    }
+    .recipe h2 {
+      margin: 0 0 0.3em;
+    }
+    .ebc-circle {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+  </style>
 </head>
 <body>
-<div class="container">
-  <h1>Beer Recipe Builder</h1>
+  <h1>🍺 Mina sparade recept</h1>
+  <div id="recipes">Laddar...</div>
 
-  <div class="flex-container">
-    <h4>Beer info</h4>
-    <div class="flex-item">
-      <div class="input-group">
-        <label for="beer_name">Beer Name:</label>
-        <input type="text" id="beer_name">
-      </div>
-      <div class="input-group">
-        <label for="beer_style">Beer Style:</label>
-        <select id="beer_style">
-          <option value="IPA">IPA</option>
-          <option value="Stout">Stout</option>
-          <option value="Pilsner">Pilsner</option>
-          <option value="Lager">Lager</option>
-          <option value="Ale">Ale</option>
-          <option value="Porter">Porter</option>
-          <option value="Wheat Beer">Wheat Beer</option>
-        </select>
-      </div>
-    </div>
-    <div class="flex-item">
-      <div class="input-group">
-        <label for="brew_date">Brew Date:</label>
-        <input type="date" id="brew_date">
-      </div>
-      <div class="input-group">
-        <label for="brew_master">Brew Master:</label>
-        <input type="text" id="brew_master">
-      </div>
-    </div>
-  </div>
+  <script>
+    const API_URL = "DIN_WEB_APP_URL_HÄR"; // ← klistra in din apps script web app URL här
 
-  <div class="flex-container">
-    <h4>Brew stats</h4>
-    <div class="flex-item">
-      <div class="input-group">
-        <label for="water">Pre-boil Vol (litres):</label>
-        <input type="number" id="water" step="0.1" min="0" value="25">
-      </div>
-      <div class="input-group">
-        <label for="mash_temp">Mash Temperature (°C):</label>
-        <input type="number" id="mash_temp" step="1" min="0" value="68">
-      </div>
-      <div class="input-group">
-        <label for="mash_time">Mash Time (minutes):</label>
-        <input type="number" id="mash_time" step="5" min="0" value="60">
-      </div>
-    </div>
-    <div class="flex-item">
-      <div class="input-group">
-        <label for="wort_boil_time">Boil time (minutes):</label>
-        <input type="number" id="wort_boil_time" value="60">
-      </div>
-      <div class="input-group">
-        <label for="liters_of_wort">Post-boil Vol (litres):</label>
-        <input type="number" id="liters_of_wort" disabled>
-      </div>
-      <div class="input-group">
-        <label for="gravity">OG:</label>
-        <input type="number" id="gravity" min="1.000" max="1.099" step="0.001" title="Wort gravity must be between 1.000 and 1.099">
-      </div>
-    </div>
-    <div class="flex-item">
-      <div class="input-group">
-        <label for="result">IBU:</label>
-        <input type="text" id="result" disabled>
-      </div>
-      <div class="input-group">
-        <label for="abv_result">ABV (%):</label>
-        <input type="text" id="abv_result" disabled>
-      </div>
-      <div class="input-group">
-        <label for="fg">FG:</label>
-        <input type="number" id="fg" min="1.000" max="1.099" step="0.001" value="1.010">
-      </div>
-    </div>
-  </div>
+    function ebcToColor(ebc) {
+      if (ebc <= 2) return "#f8f753";
+      if (ebc <= 4) return "#f6f513";
+      if (ebc <= 6) return "#f3f513";
+      if (ebc <= 8) return "#eae615";
+      if (ebc <= 10) return "#e0d01b";
+      if (ebc <= 12) return "#d5bc26";
+      if (ebc <= 14) return "#c49a35";
+      if (ebc <= 16) return "#bf923b";
+      if (ebc <= 18) return "#a36f2c";
+      if (ebc <= 20) return "#945f27";
+      if (ebc <= 22) return "#813c1c";
+      if (ebc <= 24) return "#6b2e1a";
+      if (ebc <= 26) return "#5d1e13";
+      if (ebc <= 28) return "#4e1712";
+      if (ebc <= 30) return "#3b0b0a";
+      if (ebc <= 32) return "#2e0a0a";
+      if (ebc <= 34) return "#1f0707";
+      if (ebc <= 36) return "#1b0a07";
+      if (ebc <= 38) return "#140707";
+      if (ebc <= 40) return "#100505";
+      if (ebc <= 45) return "#0d0404";
+      if (ebc <= 50) return "#0a0303";
+      if (ebc <= 60) return "#060202";
+      return "#000000";
+    }
 
-  <div class="addition_flex-container">
-    <div class="addition_flex-item">
-      <h2>Grain Addition</h2>
-      <div class="input-group">
-        <label for="malt">Weight of Grain (kg):</label>
-        <input type="number" id="malt" step="0.1" min="0">
-      </div>
-      <div class="input-group">
-        <label for="ppg">Select Malt Type:</label>
-        <select id="ppg">
-          <option value="30">Pilsner Malt</option>
-          <option value="30">Pale Ale Malt</option>
-          <option value="32">Maris Otter</option>
-          <option value="31">Wheat Malt</option>
-          <option value="28">Brown Malt</option>
-          <option value="24">Chocolate Malt</option>
-          <option value="36">American 2-row</option>
-          <option value="34">American 6-row</option>
-          <option value="38">Vienna Malt</option>
-          <option value="42">Munich Malt</option>
-        </select>
-      </div>
-      <div class="input-group">
-        <label for="efficiency">Mash Efficiency (%):</label>
-        <input type="number" id="efficiency" step="0.1" min="0" max="100" value="75">
-      </div>
-      <button onclick="addGrainAddition()">Add Grain Addition</button>
-      <div id="grain_additions"></div>
-    </div>
+    fetch(API_URL)
+      .then(res => res.json())
+      .then(data => {
+        const container = document.getElementById("recipes");
+        container.innerHTML = "";
 
-    <div class="addition_flex-item">
-      <h2>Hop Additions</h2>
-      <div class="input-group">
-        <label for="hop_variety">Hop Variety:</label>
-        <select id="hop_variety" onchange="updateAlphaAcid()">
-          <option value="Cascade" data-alpha="5.5">Cascade</option>
-          <option value="Centennial" data-alpha="10.0">Centennial</option>
-          <option value="Chinook" data-alpha="13.0">Chinook</option>
-          <option value="Citra" data-alpha="12.0">Citra</option>
-          <option value="Simcoe" data-alpha="12.5">Simcoe</option>
-        </select>
-      </div>
-      <div class="input-group">
-        <label for="hop_form">Hop Form:</label>
-        <select id="hop_form">
-          <option value="pellets">Hop Pellets</option>
-          <option value="whole">Whole Hops</option>
-        </select>
-      </div>
-      <div class="hop_additions-container">
-        <div class="input-group">
-          <label for="grams_of_hops">Grams:</label>
-          <input type="number" id="grams_of_hops">
-        </div>
-        <div class="input-group">
-          <label for="alpha_acid">AA (%):</label>
-          <input type="number" id="alpha_acid" min="0" max="100" step="0.1">
-        </div>
-        <div class="input-group">
-          <label for="boil_time">Boil time:</label>
-          <input type="number" id="boil_time">
-        </div>
-      </div>
-      <button onclick="addHopAddition()">Add Hop Addition</button>
-      <div id="hop_additions"></div>
-    </div>
-  </div>
+        data.forEach(recipe => {
+          const div = document.createElement("div");
+          div.className = "recipe";
 
-  <button onclick="saveRecipe()">Save Recipe</button>
-  <h2>Saved Recipes</h2>
-  <div id="saved_recipes"></div>
-</div>
+          const circle = `<span class="ebc-circle" style="background:${ebcToColor(recipe.ebc)};"></span>`;
 
-<script type="text/javascript" src="script.js"></script>
+          div.innerHTML = `
+            <h2>${circle}${recipe.name}</h2>
+            <p><strong>Stil:</strong> ${recipe.style || "–"}</p>
+            <p><strong>ABV:</strong> ${recipe.abv || "?"}%</p>
+            <p><strong>IBU:</strong> ${recipe.ibu || "?"}</p>
+            <p><strong>EBC:</strong> ${recipe.ebc || "?"}</p>
+          `;
+
+          container.appendChild(div);
+        });
+      })
+      .catch(err => {
+        document.getElementById("recipes").textContent = "Kunde inte hämta recept 😢";
+        console.error(err);
+      });
+  </script>
 </body>
 </html>
