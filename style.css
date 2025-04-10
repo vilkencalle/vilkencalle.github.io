@@ -50,3 +50,23 @@ button {
 button:hover {
   background: #c49a6c;
 }
+
+.ingredient-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 0.5rem;
+  align-items: center;
+}
+
+.ingredient-row select,
+.ingredient-row input {
+  flex: 1;
+}
+
+.ingredient-row .percent {
+  width: 50px;
+  text-align: right;
+  font-size: 0.9em;
+  color: #555;
+}
+
