@@ -51,6 +51,29 @@
       <label>Mash (min) <input type="number" id="mashTime" /></label>
       <label>Boil (min) <input type="number" id="boilTime" /></label>
     </section>
+    
+    <section>
+      <h2>Ingredients</h2>
+    
+      <!-- 🌾 Malts -->
+      <h3>Malts</h3>
+      <div id="malts"></div>
+      <button type="button" onclick="addMalt()">+ Lägg till malt</button>
+    
+      <!-- 🌿 Hops -->
+      <h3>Hops</h3>
+      <div id="hops"></div>
+      <button type="button" onclick="addHop()">+ Lägg till humle</button>
+    
+      <!-- 🧪 Yeast -->
+      <h3>Yeast</h3>
+      <input type="text" id="yeast" placeholder="Ange jästtyp" />
+    
+      <!-- ✨ Add-ins -->
+      <h3>Add-ins</h3>
+      <input type="text" id="addIns" placeholder="Ex: apelsinskal, kryddor..." />
+    </section>
+
 
     <!-- 🔘 Spara-knapp -->
     <button onclick="submitRecipe()">💾 Spara recept</button>
