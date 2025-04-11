@@ -41,17 +41,8 @@ async function fetchRecipes() {
     const res = await fetch(API_URL);
     const data = await res.json();
 
-    console.log("Svar från API:", data); // 👈 Vad exakt får vi?
-    
-    // Kontrollera om det är en array direkt eller inbäddat i ett objekt
-    if (Array.isArray(data)) {
-      renderRecipeList(data);
-    } else if (Array.isArray(data.recipes)) {
-      renderRecipeList(data.recipes);
-    } else {
-      console.error("❌ Kunde inte tolka dataformatet:", data);
-    }
-
+    console.log("Hämtade recept:", data.recipes); // 👈 detta är en array
+    renderRecipeList(data.recipes); // 👈 skicka bara arrayen vidare
   } catch (err) {
     console.error("Fel vid hämtning:", err.message);
   }
