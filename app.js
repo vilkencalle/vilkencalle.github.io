@@ -358,7 +358,7 @@ function addAddIn(value = "") {
 }
 
 function submitRecipe() {
-  const API_URL = "https://script.google.com/macros/s/AKfycbzLmwh6gZCg6QjUQs30TdmfKtNrI7B6_Spdl0kKZF0xUO4OlAmBuTvKz7VwFI7HU7tM/exec"; // din faktiska URL
+  const API_URL = "https://script.google.com/macros/s/AKfycbyEiEbMBJYsS9fQ51OQvTw9FV4bMHu9hDl1Kkh412sR4n3Riqzppari6TgFgjFBVgqu/exec"; // din faktiska URL
 
   const recipe = {
     beerName: document.getElementById("beerName").value,
@@ -412,7 +412,27 @@ function submitRecipe() {
     recipe.addIns.push(row.children[0].value);
   });
 
-  fetch(API_URL, {
+  fetch('https://script.google.com/macros/s/YOUR_DEPLOYED_URL/exec', {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(recipe)
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === "success") {
+      alert("🍻 Receptet har sparats!");
+    } else {
+      alert("Fel vid sparande: " + data.message);
+    }
+  })
+  .catch(err => {
+    console.error("Fetch error:", err);
+    alert("Något gick fel vid anslutning till API");
+  });
+
+  /*fetch(API_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -431,6 +451,6 @@ function submitRecipe() {
   .catch(err => {
     alert("💥 Nätverksfel: " + err.message);
     console.error(err);
-  });
+  });*/
 }
 
