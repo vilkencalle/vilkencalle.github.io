@@ -51,6 +51,7 @@ async function fetchRecipes() {
     console.error("❌ Fel vid hämtning:", err.message);
   }
 }
+
 function renderRecipeList(recipes) {
   const listContainer = document.getElementById("recipeList");
   listContainer.innerHTML = "";
@@ -71,6 +72,72 @@ function renderRecipeList(recipes) {
     `;
     listContainer.appendChild(div);
   });
+}
+
+let loadedRecipes = []; // Sparas när vi hämtar dem
+
+function loadRecipe(index) {
+  const r = loadedRecipes[index];
+  if (!r) return alert("Kunde inte ladda recept!");
+
+  document.getElementById("beerName").value = r["Beer Name"] || "";
+  document.getElementById("beerStyle").value = r["Beer Style"] || "";
+  document.getElementById("brewMaster").value = r["Brew Master"] || "";
+  document.getElementById("brewDate").value = r["Brew Date"] || "";
+  document.getElementById("preBoilVol").value = r["Pre-Boil Vol"] || "";
+  document.getElementById("og").value = r["OG"] || "";
+  document.getElementById("fg").value = r["FG"] || "";
+  document.getElementById("mashTemp").value = r["Mash Temp"] || "";
+  document.getElementById("fermTemp").value = r["Ferm Temp"] || "";
+  document.getElementById("mashVol").value = r["Mash Vol"] || "";
+  document.getElementById("mashTime").value = r["Mash Time"] || "";
+  document.getElementById("boilTime").value = r["Boil Time"] || "";
+  document.getElementById("notes").value = r["Notes"] || "";
+
+  // Visuella värden
+  calculateABV();
+  calculateIBU();
+  calculateEBC();
+  calculateMashRatio();
+
+  // Töm dynamiska fält
+  document.getElementById("malts").innerHTML = "";
+  document.getElementById("hops").innerHTML = "";
+  document.getElementById("yeastList").innerHTML = "";
+  document.getElementById("addInsList").innerHTML = "";
+
+  try {
+    JSON.parse(r["Malts"] || "[]").forEach(m => addMalt(m.name, m.weight));
+    JSON.parse(r["Hops"] || "[]").forEach(h => addHop(h.name, h.weight, h.alpha, h.time));
+    JSON.parse(r["Yeast"] || "[]").forEach(y => addYeast(y));
+    JSON.parse(r["AddIns"] || "[]").forEach(a => addAddIn(a));
+  } catch (e) {
+    console.warn("Kunde inte parsa receptets ingredienser:", e);
+  }
+}
+
+async function deleteRecipe(index) {
+  const confirmDelete = confirm("Är du säker på att du vill ta bort detta recept?");
+  if (!confirmDelete) return;
+
+  try {
+    const res = await fetch(API_URL, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ index }) // Vi utgår från att raden matchar
+    });
+
+    const result = await res.json();
+    if (result.status === "success") {
+      alert("Receptet togs bort.");
+      fetchRecipes(); // Ladda om listan
+    } else {
+      alert("Fel vid borttagning: " + result.message);
+    }
+  } catch (err) {
+    console.error("❌ Fel vid DELETE:", err);
+    alert("Något gick fel.");
+  }
 }
 
 /*async function fetchRecipes() {
