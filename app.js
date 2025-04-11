@@ -411,7 +411,7 @@ function submitRecipe() {
   });
 
   // 💾 Skicka till Google Sheets via Apps Script API
-  fetch("DIN_API_URL_HÄR", {
+  fetch("https://script.google.com/macros/s/AKfycbxxAa4GHiBzGBdRWuO5dCuLWpy0eao-_IvhkTkDWkMQGug_5WZH6VRcSV74mV8M_UGQ/exec", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(recipe)
