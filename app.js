@@ -375,6 +375,76 @@ function submitRecipe() {
     mashRatio: document.getElementById("mashRatio").textContent,
     mashTime: parseInt(document.getElementById("mashTime").value),
     boilTime: parseInt(document.getElementById("boilTime").value),
+    notes: document.getElementById("notes").value,
+    malts: [],
+    hops: [],
+    yeast: [],
+    addIns: []
+  };
+
+  // Malts
+  document.querySelectorAll("#malts .ingredient-row").forEach(row => {
+    recipe.malts.push({
+      name: row.children[0].value,
+      weight: parseFloat(row.children[1].value)
+    });
+  });
+
+  // Hops
+  document.querySelectorAll("#hops .ingredient-row").forEach(row => {
+    recipe.hops.push({
+      name: row.children[0].value,
+      weight: parseFloat(row.children[1].value),
+      alpha: parseFloat(row.children[2].value),
+      time: parseFloat(row.children[3].value)
+    });
+  });
+
+  // Yeast
+  document.querySelectorAll("#yeastList .ingredient-row").forEach(row => {
+    recipe.yeast.push(row.querySelector("input").value);
+  });
+
+  // Add-ins
+  document.querySelectorAll("#addInsList .ingredient-row").forEach(row => {
+    recipe.addIns.push(row.querySelector("input").value);
+  });
+
+  // 💾 Skicka till Google Sheets via Apps Script API
+  fetch("DIN_API_URL_HÄR", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(recipe)
+  })
+  .then(res => res.text())
+  .then(msg => {
+    console.log("Svar från Sheets:", msg);
+    alert("🍺 Receptet har skickats till Google Sheets!");
+  })
+  .catch(err => {
+    console.error("Något gick fel:", err);
+    alert("⚠️ Kunde inte skicka till Sheets.");
+  });
+}
+
+/*function submitRecipe() {
+  const recipe = {
+    beerName: document.getElementById("beerName").value,
+    beerStyle: document.getElementById("beerStyle").value,
+    brewMaster: document.getElementById("brewMaster").value,
+    brewDate: document.getElementById("brewDate").value,
+    preBoilVol: parseFloat(document.getElementById("preBoilVol").value),
+    og: parseFloat(document.getElementById("og").value),
+    fg: parseFloat(document.getElementById("fg").value),
+    abv: document.getElementById("abvDisplay").value,
+    ibu: document.getElementById("ibuDisplay").value,
+    ebc: document.getElementById("ebcDisplay").value,
+    mashTemp: parseFloat(document.getElementById("mashTemp").value),
+    fermTemp: parseFloat(document.getElementById("fermTemp").value),
+    mashVol: parseFloat(document.getElementById("mashVol").value),
+    mashRatio: document.getElementById("mashRatio").textContent,
+    mashTime: parseInt(document.getElementById("mashTime").value),
+    boilTime: parseInt(document.getElementById("boilTime").value),
     yeast: [],
     addIns: [],
     malts: [],
@@ -429,6 +499,6 @@ function submitRecipe() {
   .catch(err => {
     alert("⚠️ Nätverksfel: " + err.message);
   });
-}
+}*/
 
 
