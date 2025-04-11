@@ -411,6 +411,32 @@ function submitRecipe() {
   });
 
   // 💾 Skicka till Google Sheets via Apps Script API
+
+  // ✅ Ersätt detta med din egen Web App URL från Apps Script deployment:
+  const API_URL = "https://script.google.com/macros/s/AKfycbwWGjwnzUGLx0HA5q4AEGXXDI0OW38LRW3Lf3_k12-GBBqB4lyN0CbPr3kSSxaZivfC/exec";
+
+  // 🔁 Skicka till Google Sheets via API
+  fetch(API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(recipe)
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === "success") {
+      alert(`🍺 Receptet "${recipe.beerName}" har sparats till Google Sheets!`);
+    } else {
+      alert("❌ Fel vid sparande: " + data.message);
+      console.error(data);
+    }
+  })
+  .catch(err => {
+    alert("🚨 Ett nätverksfel inträffade!");
+    console.error(err);
+  });
+/*
   fetch("https://script.google.com/macros/s/AKfycbwWGjwnzUGLx0HA5q4AEGXXDI0OW38LRW3Lf3_k12-GBBqB4lyN0CbPr3kSSxaZivfC/exec", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -425,7 +451,7 @@ function submitRecipe() {
     console.error("Något gick fel:", err);
     alert("⚠️ Kunde inte skicka till Sheets.");
   });
-}
+}*/
 
 /*function submitRecipe() {
   const recipe = {
