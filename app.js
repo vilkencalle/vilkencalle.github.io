@@ -38,16 +38,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
 async function fetchRecipes() {
   try {
-    const res = await fetch(API_URL); // GET kräver inga headers
-    const data = await res.json();    // data = array direkt
+    const res = await fetch(API_URL);
+    const data = await res.json();
 
-    console.log("Hämtade recept:", data);
-    renderRecipeList(data); // Skicka direkt
+    console.log("Svar från API:", data); // 👈 Vad exakt får vi?
+    
+    // Kontrollera om det är en array direkt eller inbäddat i ett objekt
+    if (Array.isArray(data)) {
+      renderRecipeList(data);
+    } else if (Array.isArray(data.recipes)) {
+      renderRecipeList(data.recipes);
+    } else {
+      console.error("❌ Kunde inte tolka dataformatet:", data);
+    }
+
   } catch (err) {
     console.error("Fel vid hämtning:", err.message);
   }
 }
-
 
 function renderRecipeList(recipes) {
   const listContainer = document.getElementById("recipeList");
