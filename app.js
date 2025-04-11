@@ -41,6 +41,43 @@ async function fetchRecipes() {
     const res = await fetch(API_URL);
     const data = await res.json();
 
+    if (data.status === "success") {
+      console.log("✅ Hämtade recept:", data.recipes);
+      renderRecipeList(data.recipes);
+    } else {
+      console.error("❌ Fel från server:", data.message);
+    }
+  } catch (err) {
+    console.error("❌ Fel vid hämtning:", err.message);
+  }
+}
+function renderRecipeList(recipes) {
+  const listContainer = document.getElementById("recipeList");
+  listContainer.innerHTML = "";
+
+  if (!recipes.length) {
+    listContainer.innerHTML = "<p>Inga recept sparade ännu.</p>";
+    return;
+  }
+
+  recipes.forEach((r, index) => {
+    const div = document.createElement("div");
+    div.className = "recipe-card";
+    div.innerHTML = `
+      <strong>${r["Beer Name"] || "Namn saknas"}</strong> (${r["Beer Style"] || "Stil saknas"})<br>
+      <em>Brewed by: ${r["Brew Master"] || "–"}</em><br>
+      <button onclick="loadRecipe(${index})">Ladda</button>
+      <button onclick="deleteRecipe(${index})">Ta bort</button>
+    `;
+    listContainer.appendChild(div);
+  });
+}
+
+/*async function fetchRecipes() {
+  try {
+    const res = await fetch(API_URL);
+    const data = await res.json();
+
     console.log("Hämtade recept:", data.recipes); // 👈 detta är en array
     renderRecipeList(data.recipes); // 👈 skicka bara arrayen vidare
   } catch (err) {
@@ -63,7 +100,7 @@ function renderRecipeList(recipes) {
     `;
     listContainer.appendChild(div);
   });
-}
+}*/
 
 /*function addMalt(name = "", weight = "") {
   const row = document.createElement("div");
