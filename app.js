@@ -1,6 +1,6 @@
 const availableMalts = ["Pilsner", "Vienna", "Caramel", "Chocolate"];
 const availableHops = ["Cascade", "Saaz", "Citra", "Simcoe"];
-const API_URL = "https://script.google.com/macros/s/AKfycbzCP9kIpfVNWi8qPz4NxqUvcTe7dEuBl7dEJmqTzh75s8gozUiGma64_0FPRMzRMcE_/exec"; // din faktiska URL
+const API_URL = "https://script.google.com/macros/s/AKfycbx-jBb4ANFQcnmtha6D1dHe8AdAklhlJM-bnmEDqGvrXnOYj6FTxQ0HfXwsE5poidar/exec"; // din faktiska URL
 
 const maltColorMap = {
   "Pilsner": 3,
@@ -116,28 +116,34 @@ function loadRecipe(index) {
   }
 }
 
-function deleteRecipe(index) {
-  if (!confirm("Ta bort receptet?")) return;
+async function deleteRecipe(index) {
+  const confirmed = confirm("Ta bort detta recept?");
+  if (!confirmed) return;
 
-  fetch(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      action: "delete",  // 👈 detta styr funktionen
-      index: index
-    })
-  })
-    .then(res => res.json())
-    .then(data => {
-      if (data.status === "deleted") {
-        alert("Receptet är borttaget!");
-        fetchRecipes(); // ladda om listan
-      } else {
-        console.error("Fel vid borttagning:", data.message);
-      }
-    })
-    .catch(err => console.error("Fetch error:", err));
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        action: "delete",
+        index
+      })
+    });
+
+    const result = await res.json();
+    if (result.status === "success") {
+      alert("Recept raderat!");
+      fetchRecipes(); // Ladda om listan
+    } else {
+      console.error("Fel vid radering:", result.message);
+    }
+  } catch (err) {
+    console.error("Fetch error:", err);
+  }
 }
+
 /*async function fetchRecipes() {
   try {
     const res = await fetch(API_URL);
