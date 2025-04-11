@@ -37,16 +37,17 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function fetchRecipes() {
-  const res = await fetch(API_URL); // Inga headers krävs pga GET
-  const data = await res.json();
+  try {
+    const res = await fetch(API_URL); // GET kräver inga headers
+    const data = await res.json();    // data = array direkt
 
-  if (data.status === "success") {
-    console.log("Hämtade recept:", data.recipes);
-    renderRecipeList(data.recipes);
-  } else {
-    console.error("Fel vid hämtning:", data.message);
+    console.log("Hämtade recept:", data);
+    renderRecipeList(data); // Skicka direkt
+  } catch (err) {
+    console.error("Fel vid hämtning:", err.message);
   }
 }
+
 
 function renderRecipeList(recipes) {
   const listContainer = document.getElementById("recipeList");
