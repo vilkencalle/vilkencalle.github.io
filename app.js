@@ -1,5 +1,6 @@
 const availableMalts = ["Pilsner", "Vienna", "Caramel", "Chocolate"];
 const availableHops = ["Cascade", "Saaz", "Citra", "Simcoe"];
+const API_URL = "https://script.google.com/macros/s/AKfycbyEiEbMBJYsS9fQ51OQvTw9FV4bMHu9hDl1Kkh412sR4n3Riqzppari6TgFgjFBVgqu/exec"; // din faktiska URL
 
 const maltColorMap = {
   "Pilsner": 3,
@@ -388,8 +389,6 @@ function addAddIn(value = "") {
 }
 
 function submitRecipe() {
-  const API_URL = "https://script.google.com/macros/s/AKfycbyEiEbMBJYsS9fQ51OQvTw9FV4bMHu9hDl1Kkh412sR4n3Riqzppari6TgFgjFBVgqu/exec"; // din faktiska URL
-
   const recipe = {
     beerName: document.getElementById("beerName").value,
     beerStyle: document.getElementById("beerStyle").value,
