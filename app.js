@@ -116,30 +116,23 @@ function loadRecipe(index) {
   }
 }
 
-async function deleteRecipe(index) {
+function deleteRecipe(index) {
   if (!confirm("Ta bort detta recept?")) return;
 
-  try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ action: "delete", index })
-    });
+  // Bypassar CORS genom att sätta mode: "no-cors"
+  fetch(API_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ action: "delete", index })
+  });
 
-    const result = await res.json();
-
-    if (result.status === "success") {
-      console.log("✅ Recept raderat");
-      fetchRecipes(); // ladda om listan
-    } else {
-      console.error("❌ Fel vid radering:", result.message);
-    }
-  } catch (err) {
-    console.error("❌ Fetch-fel:", err.message);
-  }
+  // 💡 Vi får ingen respons, men vi kan ladda om listan ändå:
+  setTimeout(fetchRecipes, 500); // Liten delay för att vänta in API:et
 }
+
 
 /*async function fetchRecipes() {
   try {
