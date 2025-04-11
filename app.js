@@ -412,7 +412,23 @@ function submitRecipe() {
     recipe.addIns.push(row.children[0].value);
   });
 
-  fetch('https://script.google.com/macros/s/YOUR_DEPLOYED_URL/exec', {
+  fetch(API_URL, {
+  method: "POST",
+  mode: "no-cors", // 👈 lägg till detta!
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify(recipe)
+  })
+  .then(() => {
+    alert("🍻 Receptet har sparats!");
+  })
+  .catch(err => {
+    console.error("Fetch error:", err);
+    alert("Något gick fel!");
+  });
+
+  /*fetch('https://script.google.com/macros/s/YOUR_DEPLOYED_URL/exec', {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -430,7 +446,7 @@ function submitRecipe() {
   .catch(err => {
     console.error("Fetch error:", err);
     alert("Något gick fel vid anslutning till API");
-  });
+  });*/
 
   /*fetch(API_URL, {
     method: "POST",
