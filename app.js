@@ -1,6 +1,6 @@
 const availableMalts = ["Pilsner", "Vienna", "Caramel", "Chocolate"];
 const availableHops = ["Cascade", "Saaz", "Citra", "Simcoe"];
-const API_URL = "https://script.google.com/macros/s/AKfycbwVRuo1ytz2uWVw24M39YS2EFulOg7vt1ZksYwi1jmtMzqQsAWoFdOAofZNiGZf0kKl/exec"; // din faktiska URL
+const API_URL = "https://script.google.com/macros/s/AKfycbzCP9kIpfVNWi8qPz4NxqUvcTe7dEuBl7dEJmqTzh75s8gozUiGma64_0FPRMzRMcE_/exec"; // din faktiska URL
 
 const maltColorMap = {
   "Pilsner": 3,
