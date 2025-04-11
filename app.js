@@ -358,6 +358,8 @@ function addAddIn(value = "") {
 }
 
 function submitRecipe() {
+  const API_URL = "https://script.google.com/macros/s/AKfycbw_yPcThVzBTGrOR5ClPtZnqWxs2qEzAFFthS0bF0s/dev"; // din faktiska URL
+
   const recipe = {
     beerName: document.getElementById("beerName").value,
     beerStyle: document.getElementById("beerStyle").value,
@@ -382,7 +384,7 @@ function submitRecipe() {
     addIns: []
   };
 
-  // Malts
+  // Samla malter
   document.querySelectorAll("#malts .ingredient-row").forEach(row => {
     recipe.malts.push({
       name: row.children[0].value,
@@ -390,7 +392,7 @@ function submitRecipe() {
     });
   });
 
-  // Hops
+  // Samla humle
   document.querySelectorAll("#hops .ingredient-row").forEach(row => {
     recipe.hops.push({
       name: row.children[0].value,
@@ -400,22 +402,16 @@ function submitRecipe() {
     });
   });
 
-  // Yeast
+  // Samla jäst
   document.querySelectorAll("#yeastList .ingredient-row").forEach(row => {
-    recipe.yeast.push(row.querySelector("input").value);
+    recipe.yeast.push(row.children[0].value);
   });
 
-  // Add-ins
+  // Samla add-ins
   document.querySelectorAll("#addInsList .ingredient-row").forEach(row => {
-    recipe.addIns.push(row.querySelector("input").value);
+    recipe.addIns.push(row.children[0].value);
   });
 
-  // 💾 Skicka till Google Sheets via Apps Script API
-
-  // ✅ Ersätt detta med din egen Web App URL från Apps Script deployment:
-  const API_URL = "https://script.google.com/macros/s/AKfycbzSnTKB566noqtzcjqeDTLS5CrXXM_SDckLW3kSSlobXmDgEchC3qcGaFBQIWa2xnrj/exec";
-
-  // 🔁 Skicka till Google Sheets via API
   fetch(API_URL, {
     method: "POST",
     headers: {
@@ -423,32 +419,18 @@ function submitRecipe() {
     },
     body: JSON.stringify(recipe)
   })
-  .then(res => res.json())
+  .then(response => response.json())
   .then(data => {
     if (data.status === "success") {
-      alert(`🍺 Receptet "${recipe.beerName}" har sparats till Google Sheets!`);
+      alert("✅ Receptet har sparats!");
     } else {
-      alert("❌ Fel vid sparande: " + data.message);
+      alert("❌ Fel: " + data.message);
       console.error(data);
     }
   })
   .catch(err => {
-    alert("🚨 Ett nätverksfel inträffade!");
+    alert("💥 Nätverksfel: " + err.message);
     console.error(err);
   });
+}
 
-  /*fetch(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(recipe)
-  })
-  .then(res => res.text())
-  .then(msg => {
-    console.log("Svar från Sheets:", msg);
-    alert("🍺 Receptet har skickats till Google Sheets!");
-  })
-  .catch(err => {
-    console.error("Något gick fel:", err);
-    alert("⚠️ Kunde inte skicka till Sheets.");
-  });
-};*/
