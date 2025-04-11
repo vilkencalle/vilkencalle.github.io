@@ -130,7 +130,7 @@ function deleteRecipe(index) {
   });
 
   // 💡 Vi får ingen respons, men vi kan ladda om listan ändå:
-  setTimeout(fetchRecipes, 500); // Liten delay för att vänta in API:et
+  setTimeout(fetchRecipes, 200); // Liten delay för att vänta in API:et
 }
 
 
