@@ -116,36 +116,28 @@ function loadRecipe(index) {
   }
 }
 
-async function deleteRecipe(index) {
-  const confirmDelete = confirm("Är du säker på att du vill ta bort detta recept?");
-  if (!confirmDelete) return;
+function deleteRecipe(index) {
+  if (!confirm("Ta bort receptet?")) return;
 
-  try {
-    const res = await fetch(API_URL, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ index }) // Vi utgår från att raden matchar
-    });
-
-    const result = await res.json();
-    if (result.status === "success") {
-      alert("Receptet togs bort.");
-      fetchRecipes(); // Ladda om listan
-    } else {
-      alert("Fel vid borttagning: " + result.message);
-    }
-  } catch (err) {
-    console.error("❌ Fel vid DELETE:", err);
-    alert("Något gick fel.");
-  }
+  fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "delete",  // 👈 detta styr funktionen
+      index: index
+    })
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === "deleted") {
+        alert("Receptet är borttaget!");
+        fetchRecipes(); // ladda om listan
+      } else {
+        console.error("Fel vid borttagning:", data.message);
+      }
+    })
+    .catch(err => console.error("Fetch error:", err));
 }
-
-await fetch(API_URL, {
-  method: "DELETE",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ index })
-});
-
 /*async function fetchRecipes() {
   try {
     const res = await fetch(API_URL);
