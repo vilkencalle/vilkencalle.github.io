@@ -135,12 +135,12 @@ async function deleteRecipe(index) {
     const result = await res.json();
     if (result.status === "success") {
       alert("Recept raderat!");
-      fetchRecipes(); // Ladda om listan
+      fetchRecipes();
     } else {
       console.error("Fel vid radering:", result.message);
     }
   } catch (err) {
-    console.error("Fetch error:", err);
+    console.error("Fetch error:", err.message);
   }
 }
 
