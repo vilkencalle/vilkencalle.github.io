@@ -23,6 +23,7 @@ document.getElementById("preBoilVol").addEventListener("input", () => {
 document.getElementById("mashVol").addEventListener("input", calculateMashRatio);
 
 document.addEventListener("DOMContentLoaded", () => {
+  fetchRecipes();
   calculateABV();
   calculateIBU();
   calculateEBC();
