@@ -46,6 +46,22 @@ async function fetchRecipes() {
   }
 }
 
+function renderRecipeList(recipes) {
+  const listContainer = document.getElementById("recipeList");
+  listContainer.innerHTML = "";
+
+  recipes.forEach((r, index) => {
+    const div = document.createElement("div");
+    div.className = "recipe-card";
+    div.innerHTML = `
+      <strong>${r["Beer Name"]}</strong> (${r["Beer Style"]})<br>
+      <em>Brewed by: ${r["Brew Master"]}</em><br>
+      <button onclick="loadRecipe(${index})">Ladda</button>
+      <button onclick="deleteRecipe(${index})">Ta bort</button>
+    `;
+    listContainer.appendChild(div);
+  });
+}
 
 /*function addMalt(name = "", weight = "") {
   const row = document.createElement("div");
