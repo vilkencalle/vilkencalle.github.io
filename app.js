@@ -34,6 +34,19 @@ document.addEventListener("DOMContentLoaded", () => {
   addAddIn();
 });
 
+async function fetchRecipes() {
+  const res = await fetch(API_URL); // Inga headers krävs pga GET
+  const data = await res.json();
+
+  if (data.status === "success") {
+    console.log("Hämtade recept:", data.recipes);
+    renderRecipeList(data.recipes);
+  } else {
+    console.error("Fel vid hämtning:", data.message);
+  }
+}
+
+
 /*function addMalt(name = "", weight = "") {
   const row = document.createElement("div");
   row.className = "ingredient-row";
