@@ -140,6 +140,12 @@ async function deleteRecipe(index) {
   }
 }
 
+await fetch(API_URL, {
+  method: "DELETE",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ index })
+});
+
 /*async function fetchRecipes() {
   try {
     const res = await fetch(API_URL);
