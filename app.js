@@ -416,7 +416,7 @@ function submitRecipe() {
   const API_URL = "https://script.google.com/macros/s/AKfycbwWGjwnzUGLx0HA5q4AEGXXDI0OW38LRW3Lf3_k12-GBBqB4lyN0CbPr3kSSxaZivfC/exec";
 
   // 🔁 Skicka till Google Sheets via API
-  fetch(API_URL, {
+  /*fetch(API_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -435,9 +435,9 @@ function submitRecipe() {
   .catch(err => {
     alert("🚨 Ett nätverksfel inträffade!");
     console.error(err);
-  });
-/*
-  fetch("https://script.google.com/macros/s/AKfycbwWGjwnzUGLx0HA5q4AEGXXDI0OW38LRW3Lf3_k12-GBBqB4lyN0CbPr3kSSxaZivfC/exec", {
+  });*/
+
+  fetch(API_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(recipe)
@@ -451,7 +451,7 @@ function submitRecipe() {
     console.error("Något gick fel:", err);
     alert("⚠️ Kunde inte skicka till Sheets.");
   });
-}*/
+}
 
 /*function submitRecipe() {
   const recipe = {
