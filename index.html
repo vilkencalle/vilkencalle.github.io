@@ -2,83 +2,112 @@
 <html lang="sv">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Receptformulär</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
   <div class="container">
     <h1>🍺 Nytt Recept</h1>
 
-    <!-- 🧾 INFO -->
-    <section>
-      <h2>Info</h2>
-      <label>Beer Name <input type="text" id="beerName" /></label>
-      <label>Beer Style
-        <select id="beerStyle">
-          <option value="">-- Välj stil --</option>
-          <option value="IPA">IPA</option>
-          <option value="Lager">Lager</option>
-          <option value="Stout">Stout</option>
-        </select>
-      </label>
-      <label>Brew Master <input type="text" id="brewMaster" /></label>
-      <label>Brew Date <input type="date" id="brewDate" /></label>
+    <!-- INFO + METHOD i två kolumner -->
+    <div class="flex-row">
+      <!-- 📋 INFO -->
+      <section class="half">
+        <h2>Info</h2>
+        <label>Beer Name: <input type="text" id="beerName"></label>
+        <label>Beer Style:
+          <select id="beerStyle">
+            <option value="">-- Välj stil --</option>
+            <option value="IPA">IPA</option>
+            <option value="Lager">Lager</option>
+            <option value="Stout">Stout</option>
+          </select>
+        </label>
+        <label>Brew Master: <input type="text" id="brewMaster"></label>
+        <label>Brew Date: <input type="date" id="brewDate"></label>
 
-      <label>Pre-Boil Volume (L) <input type="number" id="preBoilVol" /></label>
-      <label>OG <input type="number" id="og" placeholder="OG (t.ex. 1.050)" step="0.001"></label>
-      <label>FG <input type="number" id="fg" placeholder="FG (t.ex. 1.010)" step="0.001"></label>
+        <div class="row top-margin">
+        <label>Pre-Boil Volume (L): <input type="number" id="preBoilVol"></label>
+        </div>
 
-      <label>IBU <input type="text" id="ibuDisplay" readonly /></label>
-      <label>EBC <input type="text" id="ebcDisplay" readonly /></label>
-      <label>ABV <input type="text" id="abvDisplay" readonly /></label>
-      <div id="ibuDisplay">IBU: –</div>
-      <div id="ebcDisplay">EBC: –</div>
-      <div id="abvDisplay">ABV: –</div>
-    </section>
+        <div class="row">
+          <label>OG: <input type="number" step="0.001" id="og"></label>
+          <label>FG: <input type="number" step="0.001" id="fg"></label>
+        </div>
 
-    <!-- 🔥 METHOD & TIMINGS -->
-    <section>
-      <h2>Method & Timings</h2>
+        <div class="row">
+          <label>IBU: <input type="text" id="ibuDisplay" disabled></label>
+          <label>EBC: <input type="text" id="ebcDisplay" disabled></label>
+          <label>ABV: <input type="text" id="abvDisplay" disabled></label>
+        </div>
 
-      <h3>Temperatures</h3>
-      <label>Mash Temp (°C) <input type="number" id="mashTemp" /></label>
-      <label>Fermentation Temp (°C) <input type="number" id="fermTemp" /></label>
+      </section>
 
-      <h3>Liquids</h3>
-      <label>Mash Liquid Volume (L) <input type="number" id="mashVol" /></label>
-      <label>Liquid/Mash Ratio <input type="text" id="mashRatio" readonly /></label>
+      <!-- 🔥 METHOD -->
+      <section class="half">
+        <h2>Method & Timings</h2>
 
-      <h3>Timings</h3>
-      <label>Mash (min) <input type="number" id="mashTime" /></label>
-      <label>Boil (min) <input type="number" id="boilTime" /></label>
-    </section>
-    
+        <h4>Temperatures</h4>
+        <label>Mash Temp (°C): <input type="number" id="mashTemp"></label>
+        <label>Fermentation Temp (°C): <input type="number" id="fermTemp"></label>
+
+        <h4>Liquids</h4>
+        <label>Mash Liquid Volume (L): <input type="number" id="mashVol"></label>
+        <label>Liquid/Mash Ratio: <input type="text" id="mashRatio" readonly></label>
+
+        <h4>Timings</h4>
+        <label>Mash Time (min): <input type="number" id="mashTime"></label>
+        <label>Boil Time (min): <input type="number" id="boilTime"></label>
+      </section>
+    </div>
+
+    <!-- 🧪 INGREDIENTS -->
     <section>
       <h2>Ingredients</h2>
-    
-      <!-- 🌾 Malts -->
-      <h3>Malts</h3>
-      <div id="malts"></div>
-      <button type="button" onclick="addMalt()">+ Lägg till malt</button>
-    
-      <!-- 🌿 Hops -->
-      <h3>Hops</h3>
-      <div id="hops"></div>
-      <button type="button" onclick="addHop()">+ Lägg till humle</button>
-    
-      <!-- 🧪 Yeast -->
-      <h3>Yeast</h3>
-      <input type="text" id="yeast" placeholder="Ange jästtyp" />
-    
-      <!-- ✨ Add-ins -->
-      <h3>Add-ins</h3>
-      <input type="text" id="addIns" placeholder="Ex: apelsinskal, kryddor..." />
+
+      <div class="ingredient-grid">
+        <!-- Första raden: Malts + Yeast -->
+        <div class="ingredient-row">
+          <div class="ingredient-column">
+            <h4>Malts</h4>
+            <div id="malts"></div>
+            <button class="add-btn" onclick="addMalt()">+</button>
+          </div>
+
+          <div class="ingredient-column">
+            <h4>Yeast</h4>
+            <div id="yeastList"></div>
+            <button class="add-btn" onclick="addYeast()">+</button>
+          </div>
+        </div>
+
+        <!-- Andra raden: Hops + Add-ins -->
+        <div class="ingredient-row">
+          <div class="ingredient-column">
+            <h4>Hops</h4>
+            <div id="hops"></div>
+            <button class="add-btn" onclick="addHop()">+</button>
+          </div>
+
+          <div class="ingredient-column">
+            <h4>Add-ins</h4>
+            <div id="addInsList"></div>
+            <button class="add-btn" onclick="addAddIn()">+</button>
+          </div>
+        </div>
+      </div>
     </section>
 
 
-    <!-- 🔘 Spara-knapp -->
+    <section>
+      <h2>Notes / Comments</h2>
+      <textarea id="notes" rows="4" placeholder="Ex: Tankrengöring behövs, testa torrhumling nästa gång..."></textarea>
+    </section>
+    
+
+
+    <!-- 💾 Spara -->
     <button onclick="submitRecipe()">💾 Spara recept</button>
   </div>
 
