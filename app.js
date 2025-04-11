@@ -358,7 +358,7 @@ function addAddIn(value = "") {
 }
 
 function submitRecipe() {
-  const API_URL = "https://script.google.com/macros/s/AKfycbzSnTKB566noqtzcjqeDTLS5CrXXM_SDckLW3kSSlobXmDgEchC3qcGaFBQIWa2xnrj/exec"; // din faktiska URL
+  const API_URL = "https://script.google.com/macros/s/AKfycbzLmwh6gZCg6QjUQs30TdmfKtNrI7B6_Spdl0kKZF0xUO4OlAmBuTvKz7VwFI7HU7tM/exec"; // din faktiska URL
 
   const recipe = {
     beerName: document.getElementById("beerName").value,
