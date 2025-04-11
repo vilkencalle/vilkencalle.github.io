@@ -413,7 +413,7 @@ function submitRecipe() {
   // 💾 Skicka till Google Sheets via Apps Script API
 
   // ✅ Ersätt detta med din egen Web App URL från Apps Script deployment:
-  const API_URL = "https://script.google.com/macros/s/AKfycbwWGjwnzUGLx0HA5q4AEGXXDI0OW38LRW3Lf3_k12-GBBqB4lyN0CbPr3kSSxaZivfC/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycbzSnTKB566noqtzcjqeDTLS5CrXXM_SDckLW3kSSlobXmDgEchC3qcGaFBQIWa2xnrj/exec";
 
   // 🔁 Skicka till Google Sheets via API
   /*fetch(API_URL, {
