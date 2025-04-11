@@ -117,8 +117,7 @@ function loadRecipe(index) {
 }
 
 async function deleteRecipe(index) {
-  const confirmed = confirm("Ta bort detta recept?");
-  if (!confirmed) return;
+  if (!confirm("Ta bort detta recept?")) return;
 
   try {
     const res = await fetch(API_URL, {
@@ -126,21 +125,19 @@ async function deleteRecipe(index) {
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({
-        action: "delete",
-        index
-      })
+      body: JSON.stringify({ action: "delete", index })
     });
 
     const result = await res.json();
+
     if (result.status === "success") {
-      alert("Recept raderat!");
-      fetchRecipes();
+      console.log("✅ Recept raderat");
+      fetchRecipes(); // ladda om listan
     } else {
-      console.error("Fel vid radering:", result.message);
+      console.error("❌ Fel vid radering:", result.message);
     }
   } catch (err) {
-    console.error("Fetch error:", err.message);
+    console.error("❌ Fetch-fel:", err.message);
   }
 }
 
