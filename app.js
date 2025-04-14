@@ -490,6 +490,142 @@ function addAddIn(value = "") {
 
 function submitRecipe() {
   const recipe = {
+    beerName: document.getElementById("beerName").value,
+    beerStyle: document.getElementById("beerStyle").value,
+    brewMaster: document.getElementById("brewMaster").value,
+    brewDate: document.getElementById("brewDate").value,
+    preBoilVol: parseFloat(document.getElementById("preBoilVol").value),
+    og: parseFloat(document.getElementById("og").value),
+    fg: parseFloat(document.getElementById("fg").value),
+    abv: document.getElementById("abvDisplay").value,
+    ibu: document.getElementById("ibuDisplay").value,
+    ebc: document.getElementById("ebcDisplay").value,
+    mashTemp: parseFloat(document.getElementById("mashTemp").value),
+    fermTemp: parseFloat(document.getElementById("fermTemp").value),
+    mashVol: parseFloat(document.getElementById("mashVol").value),
+    mashRatio: document.getElementById("mashRatio").textContent,
+    mashTime: parseInt(document.getElementById("mashTime").value),
+    boilTime: parseInt(document.getElementById("boilTime").value),
+    notes: document.getElementById("notes").value,
+    malts: [],
+    hops: [],
+    yeast: [],
+    addIns: []
+  };
+
+  // Samla malts
+  document.querySelectorAll("#malts .ingredient-row").forEach(row => {
+    recipe.malts.push({
+      name: row.children[0].value,
+      weight: parseFloat(row.children[1].value)
+    });
+  });
+
+  // Samla humle
+  document.querySelectorAll("#hops .ingredient-row").forEach(row => {
+    recipe.hops.push({
+      name: row.children[0].value,
+      weight: parseFloat(row.children[1].value),
+      alpha: parseFloat(row.children[2].value),
+      time: parseFloat(row.children[3].value)
+    });
+  });
+
+  // Samla jäst
+  document.querySelectorAll("#yeastList .ingredient-row").forEach(row => {
+    recipe.yeast.push(row.children[0].value);
+  });
+
+  // Samla add-ins
+  document.querySelectorAll("#addInsList .ingredient-row").forEach(row => {
+    recipe.addIns.push(row.children[0].value);
+  });
+
+  // 🆕 Nytt recept eller 🔄 uppdatera?
+  if (typeof loadedRecipeIndex === "number") {
+    recipe.action = "update";
+    recipe.index = loadedRecipeIndex;
+  }
+
+  fetch(API_URL, {
+    method: "POST",
+    mode: "no-cors", // 🧙‍♂️ CORS bypass (men ingen läsbar respons)
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(recipe)
+  });
+
+  alert(`💾 Receptet "${recipe.beerName}" har sparats!`);
+  loadedRecipeIndex = null;
+  setTimeout(fetchRecipes, 200);
+}
+
+
+/*function submitRecipe() {
+  const recipe = {
+    action: loadedRecipeIndex !== null ? "update" : "create",
+    index: loadedRecipeIndex,
+    beerName: document.getElementById("beerName").value,
+    beerStyle: document.getElementById("beerStyle").value,
+    brewMaster: document.getElementById("brewMaster").value,
+    brewDate: document.getElementById("brewDate").value,
+    preBoilVol: parseFloat(document.getElementById("preBoilVol").value),
+    og: parseFloat(document.getElementById("og").value),
+    fg: parseFloat(document.getElementById("fg").value),
+    abv: document.getElementById("abvDisplay").value,
+    ibu: document.getElementById("ibuDisplay").value,
+    ebc: document.getElementById("ebcDisplay").value,
+    mashTemp: parseFloat(document.getElementById("mashTemp").value),
+    fermTemp: parseFloat(document.getElementById("fermTemp").value),
+    mashVol: parseFloat(document.getElementById("mashVol").value),
+    mashRatio: document.getElementById("mashRatio").textContent,
+    mashTime: parseInt(document.getElementById("mashTime").value),
+    boilTime: parseInt(document.getElementById("boilTime").value),
+    notes: document.getElementById("notes").value,
+    malts: [],
+    hops: [],
+    yeast: [],
+    addIns: []
+  };
+
+  document.querySelectorAll("#malts .ingredient-row").forEach(row => {
+    recipe.malts.push({
+      name: row.children[0].value,
+      weight: parseFloat(row.children[1].value)
+    });
+  });
+
+  document.querySelectorAll("#hops .ingredient-row").forEach(row => {
+    recipe.hops.push({
+      name: row.children[0].value,
+      weight: parseFloat(row.children[1].value),
+      alpha: parseFloat(row.children[2].value),
+      time: parseFloat(row.children[3].value)
+    });
+  });
+
+  document.querySelectorAll("#yeastList .ingredient-row").forEach(row => {
+    recipe.yeast.push(row.children[0].value);
+  });
+
+  document.querySelectorAll("#addInsList .ingredient-row").forEach(row => {
+    recipe.addIns.push(row.children[0].value);
+  });
+
+  fetch(API_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(recipe)
+  });
+
+  alert("🍺 Receptet har sparats!");
+  setTimeout(fetchRecipes, 200);
+}*/
+
+/*function submitRecipe() {
+  const recipe = {
     action: "save", // 🔁 skillnad mot "delete"
     index: loadedRecipeIndex, // 🧠 lägg till detta!
     beerName: document.getElementById("beerName").value,
@@ -554,7 +690,7 @@ function submitRecipe() {
       console.error("Fel vid sparande:", err);
       alert("Något gick fel vid sparande.");
     });
-}
+}*/
 
 /*
 function submitRecipe() {
@@ -668,7 +804,7 @@ function submitRecipe() {
   });
 }*/
 
-function loadRecipe(index) {
+/*function loadRecipe(index) {
   fetch(API_URL)
     .then(res => res.json())
     .then(data => {
@@ -736,6 +872,70 @@ function loadRecipe(index) {
       console.error("Fel vid laddning av recept:", err);
       alert("Något gick fel vid laddning av recept.");
     });
+}*/
+
+function loadRecipe(index) {
+  fetch(API_URL)
+    .then(res => res.json())
+    .then(data => {
+      if (data.status !== "success") {
+        console.error("Fel vid laddning:", data.message);
+        return;
+      }
+
+      const recipe = data.recipes[index];
+      if (!recipe) return;
+
+      loadedRecipeIndex = index; // 👈 spara så vi kan uppdatera
+
+      // 🎯 Fyll i fälten
+      document.getElementById("beerName").value = recipe["Beer Name"] || "";
+      document.getElementById("beerStyle").value = recipe["Beer Style"] || "";
+      document.getElementById("brewMaster").value = recipe["Brew Master"] || "";
+      document.getElementById("brewDate").value = recipe["Brew Date"] || "";
+      document.getElementById("preBoilVol").value = recipe["Pre-Boil Vol"] || "";
+      document.getElementById("og").value = recipe["OG"] || "";
+      document.getElementById("fg").value = recipe["FG"] || "";
+      document.getElementById("ibuDisplay").value = recipe["IBU"] || "";
+      document.getElementById("ebcDisplay").value = recipe["EBC"] || "";
+      document.getElementById("abvDisplay").value = recipe["ABV"] || "";
+      document.getElementById("mashTemp").value = recipe["Mash Temp"] || "";
+      document.getElementById("fermTemp").value = recipe["Ferm Temp"] || "";
+      document.getElementById("mashVol").value = recipe["Mash Vol"] || "";
+      document.getElementById("mashRatio").textContent = recipe["Mash Ratio"] || "–";
+      document.getElementById("mashTime").value = recipe["Mash Time"] || "";
+      document.getElementById("boilTime").value = recipe["Boil Time"] || "";
+      document.getElementById("notes").value = recipe["Notes"] || "";
+
+      // Rensa gamla ingredienser
+      document.getElementById("malts").innerHTML = "";
+      document.getElementById("hops").innerHTML = "";
+      document.getElementById("yeastList").innerHTML = "";
+      document.getElementById("addInsList").innerHTML = "";
+
+      // Lägg till malts
+      (recipe["Malts"] || []).forEach(malt => {
+        addMalt(malt.name, malt.weight);
+      });
+
+      // Lägg till hops
+      (recipe["Hops"] || []).forEach(hop => {
+        addHop(hop.name, hop.weight, hop.alpha, hop.time);
+      });
+
+      // Lägg till yeast
+      (recipe["Yeast"] || []).forEach(y => addYeast(y));
+
+      // Lägg till addIns
+      (recipe["AddIns"] || []).forEach(a => addAddIn(a));
+
+      // 🔁 Trigga uträkningar
+      calculateABV();
+      calculateEBC();
+      calculateIBU();
+      calculateMashRatio();
+    })
+    .catch(err => console.error("Fel vid hämtning:", err.message));
 }
 
 
