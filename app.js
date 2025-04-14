@@ -938,4 +938,33 @@ function loadRecipe(index) {
     .catch(err => console.error("Fel vid hämtning:", err.message));
 }
 
+function clearForm() {
+  loadedRecipeIndex = null;
+
+  // Töm alla fält
+  document.querySelectorAll("input, select, textarea").forEach(el => {
+    if (el.type === "select-one") el.selectedIndex = 0;
+    else el.value = "";
+  });
+
+  // Töm dynamiska listor
+  document.getElementById("malts").innerHTML = "";
+  document.getElementById("hops").innerHTML = "";
+  document.getElementById("yeastList").innerHTML = "";
+  document.getElementById("addInsList").innerHTML = "";
+
+  // Återställ ratio & uträkningar
+  document.getElementById("mashRatio").textContent = "–";
+  document.getElementById("abvDisplay").value = "";
+  document.getElementById("ibuDisplay").value = "";
+  document.getElementById("ebcDisplay").value = "";
+
+  // Lägg till en rad av varje
+  addMalt();
+  addHop();
+  addYeast();
+  addAddIn();
+}
+
+
 
