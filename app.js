@@ -488,7 +488,60 @@ function addAddIn(value = "") {
   document.getElementById("addInsList").appendChild(row);
 }
 
+function collectRecipeData() {
+  const recipe = {
+    beerName: document.getElementById("beerName").value,
+    beerStyle: document.getElementById("beerStyle").value,
+    brewMaster: document.getElementById("brewMaster").value,
+    brewDate: document.getElementById("brewDate").value,
+    og: parseFloat(document.getElementById("og").value),
+    fg: parseFloat(document.getElementById("fg").value),
+    abv: document.getElementById("abvDisplay").value,
+    ibu: document.getElementById("ibuDisplay").value,
+    ebc: document.getElementById("ebcDisplay").value,
+    preBoilVol: parseFloat(document.getElementById("preBoilVol").value),
+    mashTemp: parseFloat(document.getElementById("mashTemp").value),
+    fermTemp: parseFloat(document.getElementById("fermTemp").value),
+    mashVol: parseFloat(document.getElementById("mashVol").value),
+    mashRatio: document.getElementById("mashRatio").textContent,
+    mashTime: parseInt(document.getElementById("mashTime").value),
+    boilTime: parseInt(document.getElementById("boilTime").value),
+    notes: document.getElementById("notes").value,
+    malts: [],
+    hops: [],
+    yeast: [],
+    addIns: []
+  };
+
+  document.querySelectorAll("#malts .ingredient-row").forEach(row => {
+    recipe.malts.push({
+      name: row.children[0].value,
+      weight: parseFloat(row.children[1].value)
+    });
+  });
+
+  document.querySelectorAll("#hops .ingredient-row").forEach(row => {
+    recipe.hops.push({
+      name: row.children[0].value,
+      weight: parseFloat(row.children[1].value),
+      alpha: parseFloat(row.children[2].value),
+      time: parseFloat(row.children[3].value)
+    });
+  });
+
+  document.querySelectorAll("#yeastList .ingredient-row").forEach(row => {
+    recipe.yeast.push(row.children[0].value);
+  });
+
+  document.querySelectorAll("#addInsList .ingredient-row").forEach(row => {
+    recipe.addIns.push(row.children[0].value);
+  });
+
+  return recipe;
+}
+
 function submitRecipe() {
+  /*
   const recipe = {
     beerName: document.getElementById("beerName").value,
     beerStyle: document.getElementById("beerStyle").value,
@@ -540,6 +593,7 @@ function submitRecipe() {
   document.querySelectorAll("#addInsList .ingredient-row").forEach(row => {
     recipe.addIns.push(row.children[0].value);
   });
+  */
 
   // 🆕 Nytt recept eller 🔄 uppdatera?
   if (typeof loadedRecipeIndex === "number") {
@@ -966,5 +1020,39 @@ function clearForm() {
   addAddIn();
 }
 
+function saveNewRecipe() {
+  const recipe = collectRecipeData(); // gemensam funktion nedan
 
+  fetch(API_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(recipe)
+  });
 
+  console.log("🆕 Nytt recept sparat:", recipe);
+  alert(`🍺 Nytt recept "${recipe.beerName}" sparat!`);
+  setTimeout(fetchRecipes, 200);
+}
+
+function updateRecipe() {
+  if (loadedRecipeIndex == null) {
+    alert("⚠️ Inget recept är laddat.");
+    return;
+  }
+
+  const recipe = collectRecipeData();
+  recipe.action = "update";
+  recipe.index = loadedRecipeIndex;
+
+  fetch(API_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(recipe)
+  });
+
+  console.log("✏️ Recept uppdaterat:", recipe);
+  alert(`✅ Receptet "${recipe.beerName}" uppdaterat!`);
+  setTimeout(fetchRecipes, 200);
+}
