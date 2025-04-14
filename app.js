@@ -81,11 +81,15 @@ let loadedRecipes = []; // Sparas när vi hämtar dem
 function loadRecipe(index) {
   const r = loadedRecipes[index];
   if (!r) return alert("Kunde inte ladda recept!");
+  
+  const rawDate = recipe["Brew Date"];
+  const formattedDate = rawDate ? new Date(rawDate).toISOString().split("T")[0] : "";
+  document.getElementById("brewDate").value = formattedDate;
 
   document.getElementById("beerName").value = r["Beer Name"] || "";
   document.getElementById("beerStyle").value = r["Beer Style"] || "";
   document.getElementById("brewMaster").value = r["Brew Master"] || "";
-  document.getElementById("brewDate").value = r["Brew Date"] || "";
+  //document.getElementById("brewDate").value = r["Brew Date"] || "";
   document.getElementById("preBoilVol").value = r["Pre-Boil Vol"] || "";
   document.getElementById("og").value = r["OG"] || "";
   document.getElementById("fg").value = r["FG"] || "";
