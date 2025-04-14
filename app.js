@@ -958,7 +958,7 @@ function loadRecipe(index) {
 
       document.getElementById("brewDate").value = rawDate ? formatDateLocal(rawDate) : "";
       
-      document.getElementById("brewDate").value = formattedDate;
+      //document.getElementById("brewDate").value = formattedDate;
 
       // 🎯 Fyll i fälten
       document.getElementById("beerName").value = recipe["Beer Name"] || "";
