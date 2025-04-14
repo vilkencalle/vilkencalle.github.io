@@ -947,7 +947,16 @@ function loadRecipe(index) {
       loadedRecipeIndex = index; // 👈 spara så vi kan uppdatera
 
       const rawDate = recipe["Brew Date"];
-      const formattedDate = rawDate ? new Date(rawDate).toISOString().split("T")[0] : "";
+      //const formattedDate = rawDate ? new Date(rawDate).toISOString().split("T")[0] : "";
+      
+      function formatDateLocal(dateString) {
+      const date = new Date(dateString);
+      const offset = date.getTimezoneOffset(); // i minuter
+      const localDate = new Date(date.getTime() - offset * 60 * 1000);
+      return localDate.toISOString().split("T")[0];
+      }
+
+      document.getElementById("brewDate").value = rawDate ? formatDateLocal(rawDate) : "";
       
       document.getElementById("brewDate").value = formattedDate;
 
