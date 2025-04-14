@@ -1,6 +1,6 @@
 const availableMalts = ["Pilsner", "Vienna", "Caramel", "Chocolate"];
 const availableHops = ["Cascade", "Saaz", "Citra", "Simcoe"];
-const API_URL = "https://script.google.com/macros/s/AKfycbx-jBb4ANFQcnmtha6D1dHe8AdAklhlJM-bnmEDqGvrXnOYj6FTxQ0HfXwsE5poidar/exec"; // din faktiska URL
+const API_URL = "https://script.google.com/macros/s/AKfycbwPz9hOHN-4xzmnMslb7ZQRkZCD6k6z6cpCjIu2tRtJ3huaYtOlRttNnecw78-o4MoG/exec"; // din faktiska URL
 
 const maltColorMap = {
   "Pilsner": 3,
@@ -8,6 +8,8 @@ const maltColorMap = {
   "Caramel": 20,
   "Chocolate": 800
 };
+
+let loadedRecipeIndex = null;
 
 // 👉 Event listeners för statiska fält
 document.getElementById("og").addEventListener("input", () => {
@@ -488,6 +490,75 @@ function addAddIn(value = "") {
 
 function submitRecipe() {
   const recipe = {
+    action: "save", // 🔁 skillnad mot "delete"
+    index: loadedRecipeIndex, // 🧠 lägg till detta!
+    beerName: document.getElementById("beerName").value,
+    beerStyle: document.getElementById("beerStyle").value,
+    brewMaster: document.getElementById("brewMaster").value,
+    brewDate: document.getElementById("brewDate").value,
+    preBoilVol: parseFloat(document.getElementById("preBoilVol").value),
+    og: parseFloat(document.getElementById("og").value),
+    fg: parseFloat(document.getElementById("fg").value),
+    abv: document.getElementById("abvDisplay").value,
+    ibu: document.getElementById("ibuDisplay").value,
+    ebc: document.getElementById("ebcDisplay").value,
+    mashTemp: parseFloat(document.getElementById("mashTemp").value),
+    fermTemp: parseFloat(document.getElementById("fermTemp").value),
+    mashVol: parseFloat(document.getElementById("mashVol").value),
+    mashRatio: document.getElementById("mashRatio").textContent,
+    mashTime: parseInt(document.getElementById("mashTime").value),
+    boilTime: parseInt(document.getElementById("boilTime").value),
+    yeast: [],
+    addIns: [],
+    malts: [],
+    hops: [],
+    notes: document.getElementById("notes").value
+  };
+
+  document.querySelectorAll("#malts .ingredient-row").forEach(row => {
+    recipe.malts.push({
+      name: row.children[0].value,
+      weight: parseFloat(row.children[1].value)
+    });
+  });
+
+  document.querySelectorAll("#hops .ingredient-row").forEach(row => {
+    recipe.hops.push({
+      name: row.children[0].value,
+      weight: parseFloat(row.children[1].value),
+      alpha: parseFloat(row.children[2].value),
+      time: parseFloat(row.children[3].value)
+    });
+  });
+
+  document.querySelectorAll("#yeastList .ingredient-row").forEach(row => {
+    recipe.yeast.push(row.children[0].value);
+  });
+
+  document.querySelectorAll("#addInsList .ingredient-row").forEach(row => {
+    recipe.addIns.push(row.children[0].value);
+  });
+
+  fetch(API_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(recipe)
+  })
+    .then(() => {
+      alert(`🍺 Receptet "${recipe.beerName}" har sparats!`);
+      loadedRecipeIndex = null; // 🧹 återställ så det inte sparas fel
+      setTimeout(fetchRecipes, 200);
+    })
+    .catch(err => {
+      console.error("Fel vid sparande:", err);
+      alert("Något gick fel vid sparande.");
+    });
+}
+
+/*
+function submitRecipe() {
+  const recipe = {
     beerName: document.getElementById("beerName").value,
     beerStyle: document.getElementById("beerStyle").value,
     brewMaster: document.getElementById("brewMaster").value,
@@ -594,8 +665,8 @@ function submitRecipe() {
   .catch(err => {
     alert("💥 Nätverksfel: " + err.message);
     console.error(err);
-  });*/
-}
+  });
+}*/
 
 function loadRecipe(index) {
   fetch(API_URL)
@@ -604,6 +675,8 @@ function loadRecipe(index) {
       const recipe = data.recipes[index];
       if (!recipe) return alert("Recept hittades inte!");
 
+      loadedRecipeIndex = index; // 👈 SPARA indexet
+      
       // Fyll i formulär
       document.getElementById("beerName").value = recipe["Beer Name"] || "";
       document.getElementById("beerStyle").value = recipe["Beer Style"] || "";
