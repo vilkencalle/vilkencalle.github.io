@@ -76,7 +76,7 @@ function renderRecipeList(recipes) {
   });
 }
 
-let loadedRecipes = []; // Sparas när vi hämtar dem
+/*let loadedRecipes = []; // Sparas när vi hämtar dem
 
 function loadRecipe(index) {
   const r = loadedRecipes[index];
@@ -121,7 +121,7 @@ function loadRecipe(index) {
     console.warn("Kunde inte parsa receptets ingredienser:", e);
   }
 }
-
+*/
 function deleteRecipe(index) {
   if (!confirm("Ta bort detta recept?")) return;
 
@@ -946,11 +946,16 @@ function loadRecipe(index) {
 
       loadedRecipeIndex = index; // 👈 spara så vi kan uppdatera
 
+      const rawDate = recipe["Brew Date"];
+      const formattedDate = rawDate ? new Date(rawDate).toISOString().split("T")[0] : "";
+      
+      document.getElementById("brewDate").value = formattedDate;
+
       // 🎯 Fyll i fälten
       document.getElementById("beerName").value = recipe["Beer Name"] || "";
       document.getElementById("beerStyle").value = recipe["Beer Style"] || "";
       document.getElementById("brewMaster").value = recipe["Brew Master"] || "";
-      document.getElementById("brewDate").value = recipe["Brew Date"] || "";
+      //document.getElementById("brewDate").value = recipe["Brew Date"] || "";
       document.getElementById("preBoilVol").value = recipe["Pre-Boil Vol"] || "";
       document.getElementById("og").value = recipe["OG"] || "";
       document.getElementById("fg").value = recipe["FG"] || "";
