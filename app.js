@@ -1,6 +1,6 @@
 const availableMalts = ["Pilsner", "Vienna", "Caramel", "Chocolate"];
 const availableHops = ["Cascade", "Saaz", "Citra", "Simcoe"];
-const API_URL = "https://script.google.com/macros/s/AKfycbwPz9hOHN-4xzmnMslb7ZQRkZCD6k6z6cpCjIu2tRtJ3huaYtOlRttNnecw78-o4MoG/exec"; // din faktiska URL
+const API_URL = "https://script.google.com/macros/s/AKfycbwPz9hOHN-4xzmnMslb7ZQRkZCD6k6z6cpCjIu2tRtJ3huaYtOlRttNnecw78-o4MoG/exec";
 
 const maltColorMap = {
   "Pilsner": 3,
@@ -9,22 +9,12 @@ const maltColorMap = {
   "Chocolate": 800
 };
 
+let allRecipeNames = [];
 let loadedRecipeIndex = null;
 
-// 👉 Event listeners för statiska fält
-document.getElementById("og").addEventListener("input", () => {
-  calculateABV();
-  calculateIBU();
-});
-
-document.getElementById("fg").addEventListener("input", calculateABV);
-document.getElementById("preBoilVol").addEventListener("input", () => {
-  calculateEBC();
-  calculateIBU();
-});
-
-document.getElementById("mashVol").addEventListener("input", calculateMashRatio);
-
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
   fetchRecipes();
   calculateABV();
@@ -38,13 +28,27 @@ document.addEventListener("DOMContentLoaded", () => {
   addAddIn();
 });
 
+document.getElementById("og").addEventListener("input", () => {
+  calculateABV();
+  calculateIBU();
+});
+document.getElementById("fg").addEventListener("input", calculateABV);
+document.getElementById("preBoilVol").addEventListener("input", () => {
+  calculateEBC();
+  calculateIBU();
+});
+document.getElementById("mashVol").addEventListener("input", calculateMashRatio);
+
+// ─────────────────────────────────────────────
+// HÄMTA & VISA RECEPT
+// ─────────────────────────────────────────────
 async function fetchRecipes() {
   try {
     const res = await fetch(API_URL);
     const data = await res.json();
 
     if (data.status === "success") {
-      console.log("✅ Hämtade recept:", data.recipes);
+      allRecipeNames = data.recipes.map(r => r["Beer Name"]);
       renderRecipeList(data.recipes);
     } else {
       console.error("❌ Fel från server:", data.message);
@@ -76,202 +80,144 @@ function renderRecipeList(recipes) {
   });
 }
 
-/*let loadedRecipes = []; // Sparas när vi hämtar dem
-
+// ─────────────────────────────────────────────
+// LADDA RECEPT
+// ─────────────────────────────────────────────
 function loadRecipe(index) {
-  const r = loadedRecipes[index];
-  if (!r) return alert("Kunde inte ladda recept!");
-  
-  const rawDate = recipe["Brew Date"];
-  const formattedDate = rawDate ? new Date(rawDate).toISOString().split("T")[0] : "";
-  document.getElementById("brewDate").value = formattedDate;
+  fetch(API_URL)
+    .then(res => res.json())
+    .then(data => {
+      if (data.status !== "success") return;
 
-  document.getElementById("beerName").value = r["Beer Name"] || "";
-  document.getElementById("beerStyle").value = r["Beer Style"] || "";
-  document.getElementById("brewMaster").value = r["Brew Master"] || "";
-  //document.getElementById("brewDate").value = r["Brew Date"] || "";
-  document.getElementById("preBoilVol").value = r["Pre-Boil Vol"] || "";
-  document.getElementById("og").value = r["OG"] || "";
-  document.getElementById("fg").value = r["FG"] || "";
-  document.getElementById("mashTemp").value = r["Mash Temp"] || "";
-  document.getElementById("fermTemp").value = r["Ferm Temp"] || "";
-  document.getElementById("mashVol").value = r["Mash Vol"] || "";
-  document.getElementById("mashTime").value = r["Mash Time"] || "";
-  document.getElementById("boilTime").value = r["Boil Time"] || "";
-  document.getElementById("notes").value = r["Notes"] || "";
+      const recipe = data.recipes[index];
+      if (!recipe) return;
 
-  // Visuella värden
-  calculateABV();
-  calculateIBU();
-  calculateEBC();
-  calculateMashRatio();
+      loadedRecipeIndex = index;
 
-  // Töm dynamiska fält
-  document.getElementById("malts").innerHTML = "";
-  document.getElementById("hops").innerHTML = "";
-  document.getElementById("yeastList").innerHTML = "";
-  document.getElementById("addInsList").innerHTML = "";
+      // Datumfix (lokal tidszon)
+      function formatDateLocal(dateString) {
+        const date = new Date(dateString);
+        const offset = date.getTimezoneOffset();
+        return new Date(date.getTime() - offset * 60000).toISOString().split("T")[0];
+      }
 
-  try {
-    JSON.parse(r["Malts"] || "[]").forEach(m => addMalt(m.name, m.weight));
-    JSON.parse(r["Hops"] || "[]").forEach(h => addHop(h.name, h.weight, h.alpha, h.time));
-    JSON.parse(r["Yeast"] || "[]").forEach(y => addYeast(y));
-    JSON.parse(r["AddIns"] || "[]").forEach(a => addAddIn(a));
-  } catch (e) {
-    console.warn("Kunde inte parsa receptets ingredienser:", e);
-  }
+      // Fyll i fält
+      document.getElementById("beerName").value = recipe["Beer Name"] || "";
+      document.getElementById("beerStyle").value = recipe["Beer Style"] || "";
+      document.getElementById("brewMaster").value = recipe["Brew Master"] || "";
+      document.getElementById("brewDate").value = recipe["Brew Date"] ? formatDateLocal(recipe["Brew Date"]) : "";
+      document.getElementById("og").value = recipe["OG"] || "";
+      document.getElementById("fg").value = recipe["FG"] || "";
+      document.getElementById("abvDisplay").value = recipe["ABV"] || "";
+      document.getElementById("ibuDisplay").value = recipe["IBU"] || "";
+      document.getElementById("ebcDisplay").value = recipe["EBC"] || "";
+      document.getElementById("preBoilVol").value = recipe["Pre-Boil Vol"] || "";
+      document.getElementById("mashTemp").value = recipe["Mash Temp"] || "";
+      document.getElementById("fermTemp").value = recipe["Ferm Temp"] || "";
+      document.getElementById("mashVol").value = recipe["Mash Vol"] || "";
+      document.getElementById("mashRatio").textContent = recipe["Mash Ratio"] || "–";
+      document.getElementById("mashTime").value = recipe["Mash Time"] || "";
+      document.getElementById("boilTime").value = recipe["Boil Time"] || "";
+      document.getElementById("notes").value = recipe["Notes"] || "";
+
+      // Rensa listor
+      ["malts", "hops", "yeastList", "addInsList"].forEach(id => document.getElementById(id).innerHTML = "");
+
+      (recipe["Malts"] || []).forEach(m => addMalt(m.name, m.weight));
+      (recipe["Hops"] || []).forEach(h => addHop(h.name, h.weight, h.alpha, h.time));
+      (recipe["Yeast"] || []).forEach(y => addYeast(y));
+      (recipe["AddIns"] || []).forEach(a => addAddIn(a));
+
+      calculateABV();
+      calculateEBC();
+      calculateIBU();
+      calculateMashRatio();
+    });
 }
-*/
+
+// ─────────────────────────────────────────────
+// RADERA RECEPT
+// ─────────────────────────────────────────────
 function deleteRecipe(index) {
   if (!confirm("Ta bort detta recept?")) return;
 
-  // Bypassar CORS genom att sätta mode: "no-cors"
   fetch(API_URL, {
     method: "POST",
     mode: "no-cors",
-    headers: {
-      "Content-Type": "application/json"
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ action: "delete", index })
   });
 
-  // 💡 Vi får ingen respons, men vi kan ladda om listan ändå:
-  setTimeout(fetchRecipes, 200); // Liten delay för att vänta in API:et
+  setTimeout(fetchRecipes, 300);
 }
 
+// ─────────────────────────────────────────────
+// SPARA RECEPT (ny eller uppdatera)
+// ─────────────────────────────────────────────
+function submitRecipe(mode = "new") {
+  const recipe = collectRecipeData();
+  recipe.action = mode;
 
-/*async function fetchRecipes() {
-  try {
-    const res = await fetch(API_URL);
-    const data = await res.json();
-
-    console.log("Hämtade recept:", data.recipes); // 👈 detta är en array
-    renderRecipeList(data.recipes); // 👈 skicka bara arrayen vidare
-  } catch (err) {
-    console.error("Fel vid hämtning:", err.message);
+  if (mode === "update") {
+    recipe.index = loadedRecipeIndex;
   }
+
+  fetch(API_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(recipe)
+  });
+
+  setTimeout(() => {
+    fetchRecipes();
+    alert(`🍻 Receptet har sparats!`);
+  }, 300);
 }
 
-function renderRecipeList(recipes) {
-  const listContainer = document.getElementById("recipeList");
-  listContainer.innerHTML = "";
+function saveNewRecipe() {
+  const beerName = document.getElementById("beerName").value.trim();
 
-  recipes.forEach((r, index) => {
-    const div = document.createElement("div");
-    div.className = "recipe-card";
-    div.innerHTML = `
-      <strong>${r["Beer Name"]}</strong> (${r["Beer Style"]})<br>
-      <em>Brewed by: ${r["Brew Master"]}</em><br>
-      <button onclick="loadRecipe(${index})">Ladda</button>
-      <button onclick="deleteRecipe(${index})">Ta bort</button>
-    `;
-    listContainer.appendChild(div);
-  });
-}*/
+  if (!beerName) return alert("❗ Ange ett namn för ölet.");
+  if (allRecipeNames.includes(beerName)) {
+    return alert(`⚠️ Ett recept med namnet "${beerName}" finns redan.`);
+  }
 
-/*function addMalt(name = "", weight = "") {
-  const row = document.createElement("div");
-  row.className = "ingredient-row";
-
-  const select = document.createElement("select");
-  availableMalts.forEach(m => {
-    const opt = document.createElement("option");
-    opt.value = m;
-    opt.textContent = m;
-    if (m === name) opt.selected = true;
-    select.appendChild(opt);
-  });
-
-  const input = document.createElement("input");
-  input.type = "number";
-  input.placeholder = "gram";
-  input.value = weight;
-
-  const percentSpan = document.createElement("span");
-  percentSpan.className = "percent";
-  percentSpan.textContent = "";
-
-  input.oninput = () => {
-    calculateEBC();
-    calculateMashRatio();
-    updateMaltPercentages();
-  };
-
-  select.onchange = () => {
-    calculateEBC();
-  };
-
-  row.appendChild(select);
-  row.appendChild(input);
-  row.appendChild(percentSpan);
-  document.getElementById("malts").appendChild(row);
-
-  updateMaltPercentages(); // Direkt efter tillägg
-}*/
-
-function updateMaltPercentages() {
-  const rows = document.querySelectorAll("#malts .ingredient-row");
-  let total = 0;
-
-  rows.forEach(row => {
-    const weight = parseFloat(row.children[1].value);
-    if (!isNaN(weight)) total += weight;
-  });
-
-  rows.forEach(row => {
-    let percentSpan = row.querySelector(".percent");
-    if (!percentSpan) {
-      percentSpan = document.createElement("span");
-      percentSpan.className = "percent";
-      row.appendChild(percentSpan);
-    }
-
-    const weight = parseFloat(row.children[1].value);
-    if (!isNaN(weight) && total > 0) {
-      percentSpan.textContent = `(${((weight / total) * 100).toFixed(1)}%)`;
-    } else {
-      percentSpan.textContent = "";
-    }
-  });
+  submitRecipe("new");
 }
 
-/*function addHop(name = "", weight = "", aa = "", boilTime = "") {
-  const row = document.createElement("div");
-  row.className = "ingredient-row";
+function updateRecipe() {
+  if (loadedRecipeIndex == null) return alert("⚠️ Inget recept är laddat.");
+  submitRecipe("update");
+}
 
-  const select = document.createElement("select");
-  availableHops.forEach(h => {
-    const opt = document.createElement("option");
-    opt.value = h;
-    opt.textContent = h;
-    select.appendChild(opt);
+// ─────────────────────────────────────────────
+// RENSNING
+// ─────────────────────────────────────────────
+function clearForm() {
+  loadedRecipeIndex = null;
+
+  document.querySelectorAll("input, select, textarea").forEach(el => {
+    if (el.type === "select-one") el.selectedIndex = 0;
+    else el.value = "";
   });
 
-  const g = document.createElement("input");
-  g.type = "number";
-  g.placeholder = "g";
-  g.value = weight;
+  ["malts", "hops", "yeastList", "addInsList"].forEach(id => document.getElementById(id).innerHTML = "");
 
-  const alpha = document.createElement("input");
-  alpha.type = "number";
-  alpha.placeholder = "AA%";
-  alpha.step = "0.1";
-  alpha.value = aa;
+  document.getElementById("mashRatio").textContent = "–";
+  document.getElementById("abvDisplay").value = "";
+  document.getElementById("ibuDisplay").value = "";
+  document.getElementById("ebcDisplay").value = "";
 
-  const time = document.createElement("input");
-  time.type = "number";
-  time.placeholder = "min";
-  time.value = boilTime;
+  addMalt();
+  addHop();
+  addYeast();
+  addAddIn();
+}
 
-  [g, alpha, time, select].forEach(el => el.addEventListener("input", calculateIBU));
-
-  row.appendChild(select);
-  row.appendChild(g);
-  row.appendChild(alpha);
-  row.appendChild(time);
-  document.getElementById("hops").appendChild(row);
-}*/
-
+// ─────────────────────────────────────────────
+// INGREDIENS-FUNKTIONER
+// ─────────────────────────────────────────────
 function addMalt(name = "", weight = "") {
   const row = document.createElement("div");
   row.className = "ingredient-row";
@@ -292,11 +238,10 @@ function addMalt(name = "", weight = "") {
 
   const percent = document.createElement("span");
   percent.className = "percent";
-  percent.textContent = "";
 
   const remove = document.createElement("button");
   remove.className = "remove-btn";
-  remove.innerHTML = "🗑️";
+  remove.textContent = "🗑️";
   remove.onclick = () => {
     row.remove();
     updateMaltPercentages();
@@ -305,54 +250,18 @@ function addMalt(name = "", weight = "") {
   };
 
   input.oninput = () => {
-    calculateEBC();
-    calculateMashRatio();
     updateMaltPercentages();
-  };
-  select.onchange = () => {
-    calculateEBC();
-  };
-
-  row.append(select, input, percent, remove);
-  document.getElementById("malts").appendChild(row);
-  updateMaltPercentages(); // se till att allt uppdateras
-}
-
-
-/*function addMalt(name = "", weight = "") {
-  const row = document.createElement("div");
-  row.className = "ingredient-row";
-
-  const select = document.createElement("select");
-  availableMalts.forEach(m => {
-    const opt = document.createElement("option");
-    opt.value = m;
-    opt.textContent = m;
-    if (m === name) opt.selected = true;
-    select.appendChild(opt);
-  });
-
-  const input = document.createElement("input");
-  input.type = "number";
-  input.placeholder = "g";
-  input.value = weight;
-
-  const remove = document.createElement("button");
-  remove.className = "remove-btn";
-  remove.innerHTML = "🗑️";
-  remove.onclick = () => row.remove();
-
-  input.oninput = () => {
     calculateEBC();
     calculateMashRatio();
   };
   select.onchange = calculateEBC;
 
-  row.append(select, input, remove);
+  row.append(select, input, percent, remove);
   document.getElementById("malts").appendChild(row);
-}*/
+  updateMaltPercentages();
+}
 
-function addHop(name = "", weight = "", aa = "", boilTime = "") {
+function addHop(name = "", weight = "", alpha = "", time = "") {
   const row = document.createElement("div");
   row.className = "ingredient-row";
 
@@ -370,90 +279,25 @@ function addHop(name = "", weight = "", aa = "", boilTime = "") {
   g.placeholder = "g";
   g.value = weight;
 
-  const alpha = document.createElement("input");
-  alpha.type = "number";
-  alpha.placeholder = "AA%";
-  alpha.step = "0.1";
-  alpha.value = aa;
+  const aa = document.createElement("input");
+  aa.type = "number";
+  aa.placeholder = "AA%";
+  aa.step = "0.1";
+  aa.value = alpha;
 
-  const time = document.createElement("input");
-  time.type = "number";
-  time.placeholder = "minutes";
-  time.value = boilTime;
+  const boil = document.createElement("input");
+  boil.type = "number";
+  boil.placeholder = "min";
+  boil.value = time;
 
   const remove = document.createElement("button");
   remove.className = "remove-btn";
-  remove.innerHTML = "🗑️";
+  remove.textContent = "🗑️";
   remove.onclick = () => row.remove();
 
-  [g, alpha, time, select].forEach(el => el.addEventListener("input", calculateIBU));
-
-  row.append(select, g, alpha, time, remove);
+  [g, aa, boil, select].forEach(el => el.addEventListener("input", calculateIBU));
+  row.append(select, g, aa, boil, remove);
   document.getElementById("hops").appendChild(row);
-}
-
-function calculateABV() {
-  const og = parseFloat(document.getElementById("og").value);
-  const fg = parseFloat(document.getElementById("fg").value);
-  const el = document.getElementById("abvDisplay");
-
-  if (!isNaN(og) && !isNaN(fg)) {
-    const abv = ((og - fg) * 131.25).toFixed(2);
-    el.value = `${abv}%`;
-  } else {
-    el.value = "0";
-  }
-}
-
-function calculateEBC() {
-  const rows = document.querySelectorAll("#malts .ingredient-row");
-  const volume = parseFloat(document.getElementById("preBoilVol").value) || 25;
-  let ebc = 0;
-
-  rows.forEach(row => {
-    const malt = row.children[0].value;
-    const weight = parseFloat(row.children[1].value);
-    const color = maltColorMap[malt] || 0;
-    if (!isNaN(weight)) ebc += (weight / 1000) * color;
-  });
-
-  const result = volume > 0 ? (ebc / volume) * 10 : 0;
-  document.getElementById("ebcDisplay").value = isNaN(result) ? "–" : Math.round(result);
-}
-
-function calculateIBU() {
-  const rows = document.querySelectorAll("#hops .ingredient-row");
-  const volume = parseFloat(document.getElementById("preBoilVol").value) || 25;
-  const og = parseFloat(document.getElementById("og").value) || 1.050;
-
-  let ibu = 0;
-  rows.forEach(row => {
-    const weight = parseFloat(row.children[1].value);
-    const alpha = parseFloat(row.children[2].value);
-    const time = parseFloat(row.children[3].value);
-
-    if (!isNaN(weight) && !isNaN(alpha) && !isNaN(time)) {
-      const utilization = (1.65 * Math.pow(0.000125, og - 1) * (1 - Math.exp(-0.04 * time)) / 4.15) * 1.15;
-      ibu += (weight * alpha * utilization * 10) / volume;
-    }
-  });
-
-  document.getElementById("ibuDisplay").value = isNaN(ibu) ? "–" : Math.round(ibu);
-}
-
-// ratio = mashVol / totalMaltWeight (kg)
-function calculateMashRatio() {
-  const mashVol = parseFloat(document.getElementById("mashVol").value);
-  const maltRows = document.querySelectorAll("#malts .ingredient-row");
-  let totalGrams = 0;
-
-  maltRows.forEach(row => {
-    const g = parseFloat(row.children[1].value);
-    if (!isNaN(g)) totalGrams += g;
-  });
-
-  const ratio = totalGrams > 0 ? mashVol / (totalGrams / 1000) : 0;
-  document.getElementById("mashRatio").textContent = ratio ? `${ratio.toFixed(2)}:1` : "–";
 }
 
 function addYeast(value = "") {
@@ -467,7 +311,7 @@ function addYeast(value = "") {
 
   const remove = document.createElement("button");
   remove.className = "remove-btn";
-  remove.innerHTML = "🗑️";
+  remove.textContent = "🗑️";
   remove.onclick = () => row.remove();
 
   row.append(input, remove);
@@ -480,18 +324,93 @@ function addAddIn(value = "") {
 
   const input = document.createElement("input");
   input.type = "text";
-  input.placeholder = "Ex: apelsinskal, koriander...";
+  input.placeholder = "Ex: koriander, apelsinskal...";
   input.value = value;
 
   const remove = document.createElement("button");
   remove.className = "remove-btn";
-  remove.innerHTML = "🗑️";
+  remove.textContent = "🗑️";
   remove.onclick = () => row.remove();
 
   row.append(input, remove);
   document.getElementById("addInsList").appendChild(row);
 }
 
+// ─────────────────────────────────────────────
+// BEREKNINGAR
+// ─────────────────────────────────────────────
+function updateMaltPercentages() {
+  const rows = document.querySelectorAll("#malts .ingredient-row");
+  let total = 0;
+  rows.forEach(row => {
+    const g = parseFloat(row.children[1].value);
+    if (!isNaN(g)) total += g;
+  });
+
+  rows.forEach(row => {
+    const g = parseFloat(row.children[1].value);
+    const span = row.querySelector(".percent");
+    if (!isNaN(g) && total > 0) {
+      span.textContent = `(${((g / total) * 100).toFixed(1)}%)`;
+    } else {
+      span.textContent = "";
+    }
+  });
+}
+
+function calculateABV() {
+  const og = parseFloat(document.getElementById("og").value);
+  const fg = parseFloat(document.getElementById("fg").value);
+  const el = document.getElementById("abvDisplay");
+  el.value = (!isNaN(og) && !isNaN(fg)) ? `${((og - fg) * 131.25).toFixed(2)}%` : "–";
+}
+
+function calculateEBC() {
+  const rows = document.querySelectorAll("#malts .ingredient-row");
+  const volume = parseFloat(document.getElementById("preBoilVol").value) || 25;
+  let ebc = 0;
+  rows.forEach(row => {
+    const malt = row.children[0].value;
+    const weight = parseFloat(row.children[1].value);
+    const color = maltColorMap[malt] || 0;
+    if (!isNaN(weight)) ebc += (weight / 1000) * color;
+  });
+  const result = volume > 0 ? (ebc / volume) * 10 : 0;
+  document.getElementById("ebcDisplay").value = isNaN(result) ? "–" : Math.round(result);
+}
+
+function calculateIBU() {
+  const rows = document.querySelectorAll("#hops .ingredient-row");
+  const volume = parseFloat(document.getElementById("preBoilVol").value) || 25;
+  const og = parseFloat(document.getElementById("og").value) || 1.050;
+  let ibu = 0;
+  rows.forEach(row => {
+    const weight = parseFloat(row.children[1].value);
+    const alpha = parseFloat(row.children[2].value);
+    const time = parseFloat(row.children[3].value);
+    if (!isNaN(weight) && !isNaN(alpha) && !isNaN(time)) {
+      const util = (1.65 * Math.pow(0.000125, og - 1) * (1 - Math.exp(-0.04 * time)) / 4.15) * 1.15;
+      ibu += (weight * alpha * util * 10) / volume;
+    }
+  });
+  document.getElementById("ibuDisplay").value = isNaN(ibu) ? "–" : Math.round(ibu);
+}
+
+function calculateMashRatio() {
+  const mashVol = parseFloat(document.getElementById("mashVol").value);
+  const maltRows = document.querySelectorAll("#malts .ingredient-row");
+  let total = 0;
+  maltRows.forEach(row => {
+    const g = parseFloat(row.children[1].value);
+    if (!isNaN(g)) total += g;
+  });
+  const ratio = total > 0 ? mashVol / (total / 1000) : 0;
+  document.getElementById("mashRatio").textContent = ratio ? `${ratio.toFixed(2)}:1` : "–";
+}
+
+// ─────────────────────────────────────────────
+// GEMENSAM DATASAMLING
+// ─────────────────────────────────────────────
 function collectRecipeData() {
   const recipe = {
     beerName: document.getElementById("beerName").value,
@@ -543,656 +462,3 @@ function collectRecipeData() {
 
   return recipe;
 }
-
-function submitRecipe(mode = "new") {
-  const recipe = {
-    beerName: document.getElementById("beerName").value.trim(),
-    beerStyle: document.getElementById("beerStyle").value,
-    brewMaster: document.getElementById("brewMaster").value,
-    brewDate: document.getElementById("brewDate").value,
-    og: parseFloat(document.getElementById("og").value),
-    fg: parseFloat(document.getElementById("fg").value),
-    abv: document.getElementById("abvDisplay").value,
-    ibu: document.getElementById("ibuDisplay").value,
-    ebc: document.getElementById("ebcDisplay").value,
-    preBoilVol: parseFloat(document.getElementById("preBoilVol").value),
-    mashTemp: parseFloat(document.getElementById("mashTemp").value),
-    fermTemp: parseFloat(document.getElementById("fermTemp").value),
-    mashVol: parseFloat(document.getElementById("mashVol").value),
-    mashRatio: document.getElementById("mashRatio").textContent,
-    mashTime: parseInt(document.getElementById("mashTime").value),
-    boilTime: parseInt(document.getElementById("boilTime").value),
-    notes: document.getElementById("notes").value,
-    malts: [],
-    hops: [],
-    yeast: [],
-    addIns: [],
-    action: mode
-  };
-
-  if (mode === "update") {
-    recipe.index = loadedRecipeIndex; // globalt sparad när man laddar ett recept
-  }
-
-  // Samla malts
-  document.querySelectorAll("#malts .ingredient-row").forEach(row => {
-    recipe.malts.push({
-      name: row.children[0].value,
-      weight: parseFloat(row.children[1].value)
-    });
-  });
-
-  // Samla hops
-  document.querySelectorAll("#hops .ingredient-row").forEach(row => {
-    recipe.hops.push({
-      name: row.children[0].value,
-      weight: parseFloat(row.children[1].value),
-      alpha: parseFloat(row.children[2].value),
-      time: parseFloat(row.children[3].value)
-    });
-  });
-
-  // Samla yeast
-  document.querySelectorAll("#yeastList .ingredient-row").forEach(row => {
-    recipe.yeast.push(row.children[0].value);
-  });
-
-  // Samla add-ins
-  document.querySelectorAll("#addInsList .ingredient-row").forEach(row => {
-    recipe.addIns.push(row.children[0].value);
-  });
-
-  fetch(API_URL, {
-    method: "POST",
-    mode: "no-cors", // bypass CORS
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(recipe)
-  });
-
-  setTimeout(() => {
-    fetchRecipes(); // ladda om listan
-    alert(`🍻 Receptet har sparats!`);
-  }, 300);
-}
-
-/*function submitRecipe() {
-  
-  const recipe = {
-    beerName: document.getElementById("beerName").value,
-    beerStyle: document.getElementById("beerStyle").value,
-    brewMaster: document.getElementById("brewMaster").value,
-    brewDate: document.getElementById("brewDate").value,
-    preBoilVol: parseFloat(document.getElementById("preBoilVol").value),
-    og: parseFloat(document.getElementById("og").value),
-    fg: parseFloat(document.getElementById("fg").value),
-    abv: document.getElementById("abvDisplay").value,
-    ibu: document.getElementById("ibuDisplay").value,
-    ebc: document.getElementById("ebcDisplay").value,
-    mashTemp: parseFloat(document.getElementById("mashTemp").value),
-    fermTemp: parseFloat(document.getElementById("fermTemp").value),
-    mashVol: parseFloat(document.getElementById("mashVol").value),
-    mashRatio: document.getElementById("mashRatio").textContent,
-    mashTime: parseInt(document.getElementById("mashTime").value),
-    boilTime: parseInt(document.getElementById("boilTime").value),
-    notes: document.getElementById("notes").value,
-    malts: [],
-    hops: [],
-    yeast: [],
-    addIns: []
-  };
-
-  // Samla malts
-  document.querySelectorAll("#malts .ingredient-row").forEach(row => {
-    recipe.malts.push({
-      name: row.children[0].value,
-      weight: parseFloat(row.children[1].value)
-    });
-  });
-
-  // Samla humle
-  document.querySelectorAll("#hops .ingredient-row").forEach(row => {
-    recipe.hops.push({
-      name: row.children[0].value,
-      weight: parseFloat(row.children[1].value),
-      alpha: parseFloat(row.children[2].value),
-      time: parseFloat(row.children[3].value)
-    });
-  });
-
-  // Samla jäst
-  document.querySelectorAll("#yeastList .ingredient-row").forEach(row => {
-    recipe.yeast.push(row.children[0].value);
-  });
-
-  // Samla add-ins
-  document.querySelectorAll("#addInsList .ingredient-row").forEach(row => {
-    recipe.addIns.push(row.children[0].value);
-  });
-
-  // 🆕 Nytt recept eller 🔄 uppdatera?
-  if (typeof loadedRecipeIndex === "number") {
-    recipe.action = "update";
-    recipe.index = loadedRecipeIndex;
-  }
-
-  fetch(API_URL, {
-    method: "POST",
-    mode: "no-cors", // 🧙‍♂️ CORS bypass (men ingen läsbar respons)
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(recipe)
-  });
-
-  alert(`💾 Receptet "${recipe.beerName}" har sparats!`);
-  loadedRecipeIndex = null;
-  setTimeout(fetchRecipes, 200);
-}
-*/
-
-/*function submitRecipe() {
-  const recipe = {
-    action: loadedRecipeIndex !== null ? "update" : "create",
-    index: loadedRecipeIndex,
-    beerName: document.getElementById("beerName").value,
-    beerStyle: document.getElementById("beerStyle").value,
-    brewMaster: document.getElementById("brewMaster").value,
-    brewDate: document.getElementById("brewDate").value,
-    preBoilVol: parseFloat(document.getElementById("preBoilVol").value),
-    og: parseFloat(document.getElementById("og").value),
-    fg: parseFloat(document.getElementById("fg").value),
-    abv: document.getElementById("abvDisplay").value,
-    ibu: document.getElementById("ibuDisplay").value,
-    ebc: document.getElementById("ebcDisplay").value,
-    mashTemp: parseFloat(document.getElementById("mashTemp").value),
-    fermTemp: parseFloat(document.getElementById("fermTemp").value),
-    mashVol: parseFloat(document.getElementById("mashVol").value),
-    mashRatio: document.getElementById("mashRatio").textContent,
-    mashTime: parseInt(document.getElementById("mashTime").value),
-    boilTime: parseInt(document.getElementById("boilTime").value),
-    notes: document.getElementById("notes").value,
-    malts: [],
-    hops: [],
-    yeast: [],
-    addIns: []
-  };
-
-  document.querySelectorAll("#malts .ingredient-row").forEach(row => {
-    recipe.malts.push({
-      name: row.children[0].value,
-      weight: parseFloat(row.children[1].value)
-    });
-  });
-
-  document.querySelectorAll("#hops .ingredient-row").forEach(row => {
-    recipe.hops.push({
-      name: row.children[0].value,
-      weight: parseFloat(row.children[1].value),
-      alpha: parseFloat(row.children[2].value),
-      time: parseFloat(row.children[3].value)
-    });
-  });
-
-  document.querySelectorAll("#yeastList .ingredient-row").forEach(row => {
-    recipe.yeast.push(row.children[0].value);
-  });
-
-  document.querySelectorAll("#addInsList .ingredient-row").forEach(row => {
-    recipe.addIns.push(row.children[0].value);
-  });
-
-  fetch(API_URL, {
-    method: "POST",
-    mode: "no-cors",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(recipe)
-  });
-
-  alert("🍺 Receptet har sparats!");
-  setTimeout(fetchRecipes, 200);
-}*/
-
-/*function submitRecipe() {
-  const recipe = {
-    action: "save", // 🔁 skillnad mot "delete"
-    index: loadedRecipeIndex, // 🧠 lägg till detta!
-    beerName: document.getElementById("beerName").value,
-    beerStyle: document.getElementById("beerStyle").value,
-    brewMaster: document.getElementById("brewMaster").value,
-    brewDate: document.getElementById("brewDate").value,
-    preBoilVol: parseFloat(document.getElementById("preBoilVol").value),
-    og: parseFloat(document.getElementById("og").value),
-    fg: parseFloat(document.getElementById("fg").value),
-    abv: document.getElementById("abvDisplay").value,
-    ibu: document.getElementById("ibuDisplay").value,
-    ebc: document.getElementById("ebcDisplay").value,
-    mashTemp: parseFloat(document.getElementById("mashTemp").value),
-    fermTemp: parseFloat(document.getElementById("fermTemp").value),
-    mashVol: parseFloat(document.getElementById("mashVol").value),
-    mashRatio: document.getElementById("mashRatio").textContent,
-    mashTime: parseInt(document.getElementById("mashTime").value),
-    boilTime: parseInt(document.getElementById("boilTime").value),
-    yeast: [],
-    addIns: [],
-    malts: [],
-    hops: [],
-    notes: document.getElementById("notes").value
-  };
-
-  document.querySelectorAll("#malts .ingredient-row").forEach(row => {
-    recipe.malts.push({
-      name: row.children[0].value,
-      weight: parseFloat(row.children[1].value)
-    });
-  });
-
-  document.querySelectorAll("#hops .ingredient-row").forEach(row => {
-    recipe.hops.push({
-      name: row.children[0].value,
-      weight: parseFloat(row.children[1].value),
-      alpha: parseFloat(row.children[2].value),
-      time: parseFloat(row.children[3].value)
-    });
-  });
-
-  document.querySelectorAll("#yeastList .ingredient-row").forEach(row => {
-    recipe.yeast.push(row.children[0].value);
-  });
-
-  document.querySelectorAll("#addInsList .ingredient-row").forEach(row => {
-    recipe.addIns.push(row.children[0].value);
-  });
-
-  fetch(API_URL, {
-    method: "POST",
-    mode: "no-cors",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(recipe)
-  })
-    .then(() => {
-      alert(`🍺 Receptet "${recipe.beerName}" har sparats!`);
-      loadedRecipeIndex = null; // 🧹 återställ så det inte sparas fel
-      setTimeout(fetchRecipes, 200);
-    })
-    .catch(err => {
-      console.error("Fel vid sparande:", err);
-      alert("Något gick fel vid sparande.");
-    });
-}*/
-
-/*
-function submitRecipe() {
-  const recipe = {
-    beerName: document.getElementById("beerName").value,
-    beerStyle: document.getElementById("beerStyle").value,
-    brewMaster: document.getElementById("brewMaster").value,
-    brewDate: document.getElementById("brewDate").value,
-    preBoilVol: parseFloat(document.getElementById("preBoilVol").value),
-    og: parseFloat(document.getElementById("og").value),
-    fg: parseFloat(document.getElementById("fg").value),
-    abv: document.getElementById("abvDisplay").value,
-    ibu: document.getElementById("ibuDisplay").value,
-    ebc: document.getElementById("ebcDisplay").value,
-    mashTemp: parseFloat(document.getElementById("mashTemp").value),
-    fermTemp: parseFloat(document.getElementById("fermTemp").value),
-    mashVol: parseFloat(document.getElementById("mashVol").value),
-    mashRatio: document.getElementById("mashRatio").textContent,
-    mashTime: parseInt(document.getElementById("mashTime").value),
-    boilTime: parseInt(document.getElementById("boilTime").value),
-    notes: document.getElementById("notes").value,
-    malts: [],
-    hops: [],
-    yeast: [],
-    addIns: []
-  };
-
-  // Samla malter
-  document.querySelectorAll("#malts .ingredient-row").forEach(row => {
-    recipe.malts.push({
-      name: row.children[0].value,
-      weight: parseFloat(row.children[1].value)
-    });
-  });
-
-  // Samla humle
-  document.querySelectorAll("#hops .ingredient-row").forEach(row => {
-    recipe.hops.push({
-      name: row.children[0].value,
-      weight: parseFloat(row.children[1].value),
-      alpha: parseFloat(row.children[2].value),
-      time: parseFloat(row.children[3].value)
-    });
-  });
-
-  // Samla jäst
-  document.querySelectorAll("#yeastList .ingredient-row").forEach(row => {
-    recipe.yeast.push(row.children[0].value);
-  });
-
-  // Samla add-ins
-  document.querySelectorAll("#addInsList .ingredient-row").forEach(row => {
-    recipe.addIns.push(row.children[0].value);
-  });
-
-  fetch(API_URL, {
-  method: "POST",
-  mode: "no-cors", // 👈 lägg till detta!
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify(recipe)
-  })
-  .then(() => {
-    alert("🍻 Receptet har sparats!");
-  })
-  .catch(err => {
-    console.error("Fetch error:", err);
-    alert("Något gick fel!");
-  });
-
-  /*fetch('https://script.google.com/macros/s/YOUR_DEPLOYED_URL/exec', {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(recipe)
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.status === "success") {
-      alert("🍻 Receptet har sparats!");
-    } else {
-      alert("Fel vid sparande: " + data.message);
-    }
-  })
-  .catch(err => {
-    console.error("Fetch error:", err);
-    alert("Något gick fel vid anslutning till API");
-  });*/
-
-  /*fetch(API_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(recipe)
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.status === "success") {
-      alert("✅ Receptet har sparats!");
-    } else {
-      alert("❌ Fel: " + data.message);
-      console.error(data);
-    }
-  })
-  .catch(err => {
-    alert("💥 Nätverksfel: " + err.message);
-    console.error(err);
-  });
-}*/
-
-/*function loadRecipe(index) {
-  fetch(API_URL)
-    .then(res => res.json())
-    .then(data => {
-      const recipe = data.recipes[index];
-      if (!recipe) return alert("Recept hittades inte!");
-
-      loadedRecipeIndex = index; // 👈 SPARA indexet
-      
-      // Fyll i formulär
-      document.getElementById("beerName").value = recipe["Beer Name"] || "";
-      document.getElementById("beerStyle").value = recipe["Beer Style"] || "";
-      document.getElementById("brewMaster").value = recipe["Brew Master"] || "";
-      document.getElementById("brewDate").value = recipe["Brew Date"] || "";
-
-      document.getElementById("preBoilVol").value = recipe["Pre-Boil Vol"] || "";
-      document.getElementById("og").value = recipe["OG"] || "";
-      document.getElementById("fg").value = recipe["FG"] || "";
-
-      document.getElementById("ibuDisplay").value = recipe["IBU"] || "";
-      document.getElementById("ebcDisplay").value = recipe["EBC"] || "";
-      document.getElementById("abvDisplay").value = recipe["ABV"] || "";
-
-      document.getElementById("mashTemp").value = recipe["Mash Temp"] || "";
-      document.getElementById("fermTemp").value = recipe["Ferm Temp"] || "";
-      document.getElementById("mashVol").value = recipe["Mash Vol"] || "";
-      document.getElementById("mashTime").value = recipe["Mash Time"] || "";
-      document.getElementById("boilTime").value = recipe["Boil Time"] || "";
-
-      document.getElementById("notes").value = recipe["Notes"] || "";
-
-      // Återställ befintliga ingredienser
-      document.getElementById("malts").innerHTML = "";
-      document.getElementById("hops").innerHTML = "";
-      document.getElementById("yeastList").innerHTML = "";
-      document.getElementById("addInsList").innerHTML = "";
-
-      // Lägg till malts
-      (recipe["Malts"] || []).forEach(malt => {
-        addMalt(malt.name, malt.weight);
-      });
-
-      // Lägg till hops
-      (recipe["Hops"] || []).forEach(hop => {
-        addHop(hop.name, hop.weight, hop.alpha, hop.time);
-      });
-
-      // Lägg till yeast
-      (recipe["Yeast"] || []).forEach(yeast => {
-        addYeast(yeast);
-      });
-
-      // Lägg till add-ins
-      (recipe["AddIns"] || []).forEach(addin => {
-        addAddIn(addin);
-      });
-
-      // Räkna om allt
-      calculateABV();
-      calculateIBU();
-      calculateEBC();
-      calculateMashRatio();
-      updateMaltPercentages();
-    })
-    .catch(err => {
-      console.error("Fel vid laddning av recept:", err);
-      alert("Något gick fel vid laddning av recept.");
-    });
-}*/
-
-function loadRecipe(index) {
-  fetch(API_URL)
-    .then(res => res.json())
-    .then(data => {
-      if (data.status !== "success") {
-        console.error("Fel vid laddning:", data.message);
-        return;
-      }
-
-      const recipe = data.recipes[index];
-      if (!recipe) return;
-
-      loadedRecipeIndex = index; // 👈 spara så vi kan uppdatera
-
-      const rawDate = recipe["Brew Date"];
-      //const formattedDate = rawDate ? new Date(rawDate).toISOString().split("T")[0] : "";
-      
-      function formatDateLocal(dateString) {
-      const date = new Date(dateString);
-      const offset = date.getTimezoneOffset(); // i minuter
-      const localDate = new Date(date.getTime() - offset * 60 * 1000);
-      return localDate.toISOString().split("T")[0];
-      }
-
-      document.getElementById("brewDate").value = rawDate ? formatDateLocal(rawDate) : "";
-      
-      //document.getElementById("brewDate").value = formattedDate;
-
-      // 🎯 Fyll i fälten
-      document.getElementById("beerName").value = recipe["Beer Name"] || "";
-      document.getElementById("beerStyle").value = recipe["Beer Style"] || "";
-      document.getElementById("brewMaster").value = recipe["Brew Master"] || "";
-      //document.getElementById("brewDate").value = recipe["Brew Date"] || "";
-      document.getElementById("preBoilVol").value = recipe["Pre-Boil Vol"] || "";
-      document.getElementById("og").value = recipe["OG"] || "";
-      document.getElementById("fg").value = recipe["FG"] || "";
-      document.getElementById("ibuDisplay").value = recipe["IBU"] || "";
-      document.getElementById("ebcDisplay").value = recipe["EBC"] || "";
-      document.getElementById("abvDisplay").value = recipe["ABV"] || "";
-      document.getElementById("mashTemp").value = recipe["Mash Temp"] || "";
-      document.getElementById("fermTemp").value = recipe["Ferm Temp"] || "";
-      document.getElementById("mashVol").value = recipe["Mash Vol"] || "";
-      document.getElementById("mashRatio").textContent = recipe["Mash Ratio"] || "–";
-      document.getElementById("mashTime").value = recipe["Mash Time"] || "";
-      document.getElementById("boilTime").value = recipe["Boil Time"] || "";
-      document.getElementById("notes").value = recipe["Notes"] || "";
-
-      // Rensa gamla ingredienser
-      document.getElementById("malts").innerHTML = "";
-      document.getElementById("hops").innerHTML = "";
-      document.getElementById("yeastList").innerHTML = "";
-      document.getElementById("addInsList").innerHTML = "";
-
-      // Lägg till malts
-      (recipe["Malts"] || []).forEach(malt => {
-        addMalt(malt.name, malt.weight);
-      });
-
-      // Lägg till hops
-      (recipe["Hops"] || []).forEach(hop => {
-        addHop(hop.name, hop.weight, hop.alpha, hop.time);
-      });
-
-      // Lägg till yeast
-      (recipe["Yeast"] || []).forEach(y => addYeast(y));
-
-      // Lägg till addIns
-      (recipe["AddIns"] || []).forEach(a => addAddIn(a));
-
-      // 🔁 Trigga uträkningar
-      calculateABV();
-      calculateEBC();
-      calculateIBU();
-      calculateMashRatio();
-    })
-    .catch(err => console.error("Fel vid hämtning:", err.message));
-}
-
-function clearForm() {
-  loadedRecipeIndex = null;
-
-  // Töm alla fält
-  document.querySelectorAll("input, select, textarea").forEach(el => {
-    if (el.type === "select-one") el.selectedIndex = 0;
-    else el.value = "";
-  });
-
-  // Töm dynamiska listor
-  document.getElementById("malts").innerHTML = "";
-  document.getElementById("hops").innerHTML = "";
-  document.getElementById("yeastList").innerHTML = "";
-  document.getElementById("addInsList").innerHTML = "";
-
-  // Återställ ratio & uträkningar
-  document.getElementById("mashRatio").textContent = "–";
-  document.getElementById("abvDisplay").value = "";
-  document.getElementById("ibuDisplay").value = "";
-  document.getElementById("ebcDisplay").value = "";
-
-  // Lägg till en rad av varje
-  addMalt();
-  addHop();
-  addYeast();
-  addAddIn();
-}
-
-function saveNewRecipe() {
-  const beerName = document.getElementById("beerName").value.trim();
-
-  if (!beerName) {
-    alert("❗ Ange ett namn för ölet.");
-    return;
-  }
-
-  if (allRecipeNames.includes(beerName)) {
-    alert(`⚠️ Ett recept med namnet "${beerName}" finns redan. Du kan uppdatera det istället eller byta namn.`);
-    return;
-  }
-
-  submitRecipe("new");
-}
-
-/*function saveNewRecipe() {
-  const recipe = collectRecipeData(); // gemensam funktion nedan
-
-  fetch(API_URL, {
-    method: "POST",
-    mode: "no-cors",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(recipe)
-  });
-
-  console.log("🆕 Nytt recept sparat:", recipe);
-  alert(`🍺 Nytt recept "${recipe.beerName}" sparat!`);
-  setTimeout(fetchRecipes, 200);
-}*/
-
-function updateRecipe() {
-  if (loadedRecipeIndex == null) {
-    alert("⚠️ Inget recept är laddat.");
-    return;
-  }
-
-  const recipe = collectRecipeData();
-  recipe.action = "update";
-  recipe.index = loadedRecipeIndex;
-
-  fetch(API_URL, {
-    method: "POST",
-    mode: "no-cors",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(recipe)
-  });
-
-  console.log("✏️ Recept uppdaterat:", recipe);
-  alert(`✅ Receptet "${recipe.beerName}" uppdaterat!`);
-  setTimeout(fetchRecipes, 200);
-}
-
-function updateLoadedRecipe() {
-  if (loadedRecipeIndex == null) {
-    alert("❗ Du måste ladda ett recept innan du kan uppdatera det.");
-    return;
-  }
-
-  submitRecipe("update");
-}
-
-function resetForm() {
-  document.querySelectorAll("input, select, textarea").forEach(el => {
-    if (el.type !== "button" && el.type !== "submit") el.value = "";
-  });
-
-  document.getElementById("abvDisplay").value = "–";
-  document.getElementById("ibuDisplay").value = "–";
-  document.getElementById("ebcDisplay").value = "–";
-  document.getElementById("mashRatio").textContent = "–";
-
-  document.getElementById("malts").innerHTML = "";
-  document.getElementById("hops").innerHTML = "";
-  document.getElementById("yeastList").innerHTML = "";
-  document.getElementById("addInsList").innerHTML = "";
-
-  addMalt();
-  addHop();
-  addYeast();
-  addAddIn();
-
-  loadedRecipeIndex = null;
-}
-
-
