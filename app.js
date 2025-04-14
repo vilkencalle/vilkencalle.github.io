@@ -597,3 +597,72 @@ function submitRecipe() {
   });*/
 }
 
+function loadRecipe(index) {
+  fetch(API_URL)
+    .then(res => res.json())
+    .then(data => {
+      const recipe = data.recipes[index];
+      if (!recipe) return alert("Recept hittades inte!");
+
+      // Fyll i formulär
+      document.getElementById("beerName").value = recipe["Beer Name"] || "";
+      document.getElementById("beerStyle").value = recipe["Beer Style"] || "";
+      document.getElementById("brewMaster").value = recipe["Brew Master"] || "";
+      document.getElementById("brewDate").value = recipe["Brew Date"] || "";
+
+      document.getElementById("preBoilVol").value = recipe["Pre-Boil Vol"] || "";
+      document.getElementById("og").value = recipe["OG"] || "";
+      document.getElementById("fg").value = recipe["FG"] || "";
+
+      document.getElementById("ibuDisplay").value = recipe["IBU"] || "";
+      document.getElementById("ebcDisplay").value = recipe["EBC"] || "";
+      document.getElementById("abvDisplay").value = recipe["ABV"] || "";
+
+      document.getElementById("mashTemp").value = recipe["Mash Temp"] || "";
+      document.getElementById("fermTemp").value = recipe["Ferm Temp"] || "";
+      document.getElementById("mashVol").value = recipe["Mash Vol"] || "";
+      document.getElementById("mashTime").value = recipe["Mash Time"] || "";
+      document.getElementById("boilTime").value = recipe["Boil Time"] || "";
+
+      document.getElementById("notes").value = recipe["Notes"] || "";
+
+      // Återställ befintliga ingredienser
+      document.getElementById("malts").innerHTML = "";
+      document.getElementById("hops").innerHTML = "";
+      document.getElementById("yeastList").innerHTML = "";
+      document.getElementById("addInsList").innerHTML = "";
+
+      // Lägg till malts
+      (recipe["Malts"] || []).forEach(malt => {
+        addMalt(malt.name, malt.weight);
+      });
+
+      // Lägg till hops
+      (recipe["Hops"] || []).forEach(hop => {
+        addHop(hop.name, hop.weight, hop.alpha, hop.time);
+      });
+
+      // Lägg till yeast
+      (recipe["Yeast"] || []).forEach(yeast => {
+        addYeast(yeast);
+      });
+
+      // Lägg till add-ins
+      (recipe["AddIns"] || []).forEach(addin => {
+        addAddIn(addin);
+      });
+
+      // Räkna om allt
+      calculateABV();
+      calculateIBU();
+      calculateEBC();
+      calculateMashRatio();
+      updateMaltPercentages();
+    })
+    .catch(err => {
+      console.error("Fel vid laddning av recept:", err);
+      alert("Något gick fel vid laddning av recept.");
+    });
+}
+
+
