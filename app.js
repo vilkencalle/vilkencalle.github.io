@@ -544,8 +544,81 @@ function collectRecipeData() {
   return recipe;
 }
 
-function submitRecipe() {
-  /*
+function submitRecipe(mode = "new") {
+  const recipe = {
+    beerName: document.getElementById("beerName").value.trim(),
+    beerStyle: document.getElementById("beerStyle").value,
+    brewMaster: document.getElementById("brewMaster").value,
+    brewDate: document.getElementById("brewDate").value,
+    og: parseFloat(document.getElementById("og").value),
+    fg: parseFloat(document.getElementById("fg").value),
+    abv: document.getElementById("abvDisplay").value,
+    ibu: document.getElementById("ibuDisplay").value,
+    ebc: document.getElementById("ebcDisplay").value,
+    preBoilVol: parseFloat(document.getElementById("preBoilVol").value),
+    mashTemp: parseFloat(document.getElementById("mashTemp").value),
+    fermTemp: parseFloat(document.getElementById("fermTemp").value),
+    mashVol: parseFloat(document.getElementById("mashVol").value),
+    mashRatio: document.getElementById("mashRatio").textContent,
+    mashTime: parseInt(document.getElementById("mashTime").value),
+    boilTime: parseInt(document.getElementById("boilTime").value),
+    notes: document.getElementById("notes").value,
+    malts: [],
+    hops: [],
+    yeast: [],
+    addIns: [],
+    action: mode
+  };
+
+  if (mode === "update") {
+    recipe.index = loadedRecipeIndex; // globalt sparad när man laddar ett recept
+  }
+
+  // Samla malts
+  document.querySelectorAll("#malts .ingredient-row").forEach(row => {
+    recipe.malts.push({
+      name: row.children[0].value,
+      weight: parseFloat(row.children[1].value)
+    });
+  });
+
+  // Samla hops
+  document.querySelectorAll("#hops .ingredient-row").forEach(row => {
+    recipe.hops.push({
+      name: row.children[0].value,
+      weight: parseFloat(row.children[1].value),
+      alpha: parseFloat(row.children[2].value),
+      time: parseFloat(row.children[3].value)
+    });
+  });
+
+  // Samla yeast
+  document.querySelectorAll("#yeastList .ingredient-row").forEach(row => {
+    recipe.yeast.push(row.children[0].value);
+  });
+
+  // Samla add-ins
+  document.querySelectorAll("#addInsList .ingredient-row").forEach(row => {
+    recipe.addIns.push(row.children[0].value);
+  });
+
+  fetch(API_URL, {
+    method: "POST",
+    mode: "no-cors", // bypass CORS
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(recipe)
+  });
+
+  setTimeout(() => {
+    fetchRecipes(); // ladda om listan
+    alert(`🍻 Receptet har sparats!`);
+  }, 300);
+}
+
+/*function submitRecipe() {
+  
   const recipe = {
     beerName: document.getElementById("beerName").value,
     beerStyle: document.getElementById("beerStyle").value,
@@ -597,7 +670,6 @@ function submitRecipe() {
   document.querySelectorAll("#addInsList .ingredient-row").forEach(row => {
     recipe.addIns.push(row.children[0].value);
   });
-  */
 
   // 🆕 Nytt recept eller 🔄 uppdatera?
   if (typeof loadedRecipeIndex === "number") {
@@ -618,7 +690,7 @@ function submitRecipe() {
   loadedRecipeIndex = null;
   setTimeout(fetchRecipes, 200);
 }
-
+*/
 
 /*function submitRecipe() {
   const recipe = {
@@ -1039,6 +1111,22 @@ function clearForm() {
 }
 
 function saveNewRecipe() {
+  const beerName = document.getElementById("beerName").value.trim();
+
+  if (!beerName) {
+    alert("❗ Ange ett namn för ölet.");
+    return;
+  }
+
+  if (allRecipeNames.includes(beerName)) {
+    alert(`⚠️ Ett recept med namnet "${beerName}" finns redan. Du kan uppdatera det istället eller byta namn.`);
+    return;
+  }
+
+  submitRecipe("new");
+}
+
+/*function saveNewRecipe() {
   const recipe = collectRecipeData(); // gemensam funktion nedan
 
   fetch(API_URL, {
@@ -1051,7 +1139,7 @@ function saveNewRecipe() {
   console.log("🆕 Nytt recept sparat:", recipe);
   alert(`🍺 Nytt recept "${recipe.beerName}" sparat!`);
   setTimeout(fetchRecipes, 200);
-}
+}*/
 
 function updateRecipe() {
   if (loadedRecipeIndex == null) {
@@ -1074,3 +1162,37 @@ function updateRecipe() {
   alert(`✅ Receptet "${recipe.beerName}" uppdaterat!`);
   setTimeout(fetchRecipes, 200);
 }
+
+function updateLoadedRecipe() {
+  if (loadedRecipeIndex == null) {
+    alert("❗ Du måste ladda ett recept innan du kan uppdatera det.");
+    return;
+  }
+
+  submitRecipe("update");
+}
+
+function resetForm() {
+  document.querySelectorAll("input, select, textarea").forEach(el => {
+    if (el.type !== "button" && el.type !== "submit") el.value = "";
+  });
+
+  document.getElementById("abvDisplay").value = "–";
+  document.getElementById("ibuDisplay").value = "–";
+  document.getElementById("ebcDisplay").value = "–";
+  document.getElementById("mashRatio").textContent = "–";
+
+  document.getElementById("malts").innerHTML = "";
+  document.getElementById("hops").innerHTML = "";
+  document.getElementById("yeastList").innerHTML = "";
+  document.getElementById("addInsList").innerHTML = "";
+
+  addMalt();
+  addHop();
+  addYeast();
+  addAddIn();
+
+  loadedRecipeIndex = null;
+}
+
+
