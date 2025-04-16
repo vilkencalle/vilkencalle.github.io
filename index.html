@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Brew Recipe Form</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="recipe-post">
+    <h1>BarkaBrew</h1>
+
+    <!-- Meta Info -->
+    <section class="recipe-meta">
+      <div class="meta-grid">
+        <div>
+          <label for="beerName">Beer Name</label>
+          <input type="text" id="beerName" />
+        </div>
+        <div>
+          <label for="beerStyle">Beer Style</label>
+          <select id="beerStyle">
+            <option value="">-- Choose style --</option>
+          </select>
+        </div>
+        <div>
+          <label for="brewMaster">Brew Master</label>
+          <input type="text" id="brewMaster" />
+        </div>
+        <div>
+          <label for="brewDate">Brew Date</label>
+          <input type="date" id="brewDate" />
+        </div>
+      </div>
+
+      <div class="ebc-scale-container">
+        <div class="ebc-scale">
+          <div class="ebc-indicator" id="ebcIndicator"></div>
+        </div>
+        <div id="styleReferenceBox" class="style-reference hidden"></div>
+        <div class="stats">
+          <div class="stat-block">
+            <span class="stats-label">IBU</span>
+            <span id="ibuDisplay" class="stat-value">–</span>
+          </div>
+          <div class="stat-block">
+            <span class="stats-label">EBC</span>
+            <span id="ebcDisplay" class="stat-value">–</span>
+          </div>
+          <div class="stat-block">
+            <span class="stats-label">ABV</span>
+            <span id="abvDisplay" class="stat-value">–</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Method & Timing -->
+    <section class="recipe-meta">
+      <h2>Method & Timings</h2>
+      <div class="meta-grid">
+        <div>
+          <h4>Volumes</h4>
+          <div>
+            <label>Pre-Boil Volume (L)</label>
+            <input type="number" id="preBoilVol" />
+          </div>
+          <div>
+            <label>Post-Boil Volume (L)</label>
+            <input type="number" id="mashVol" />
+          </div>
+          <div>
+            <label>Liquid/Mash Ratio</label>
+            <input type="text" id="mashRatio" readonly />
+          </div>
+        </div>
+        <div>
+          <h4>Temperatures</h4>
+          <div>
+            <label>Mash Temp (°C)</label>
+            <input type="number" id="mashTemp" />
+          </div>
+          <div>
+            <label>Fermentation Temp (°C)</label>
+            <input type="number" id="fermTemp" />
+          </div>
+        </div>
+        <div>
+          <h4>Timings</h4>
+          <div>
+            <label>Mash Time (min)</label>
+            <input type="number" id="mashTime" />
+          </div>
+          <div>
+            <label>Boil Time (min)</label>
+            <input type="number" id="boilTime" />
+          </div>
+        </div>
+        <div>
+          <h4>Gravity</h4>
+          <div>
+            <label>OG</label>
+            <input type="number" step="0.001" id="og" />
+          </div>
+          <div>
+            <label>FG</label>
+            <input type="number" step="0.001" id="fg" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Ingredients -->
+    <section class="recipe-meta">
+      <h2>Ingredients</h2>
+      <div class="meta-grid">
+        <div>
+          <h3>Malts</h3>
+          <div id="malts"></div>
+          <button class="add-btn" onclick="addMalt()">+ Add Malt</button>
+        </div>
+        <div>
+          <h3>Yeast</h3>
+          <div id="yeastList"></div>
+          <button class="add-btn" onclick="addYeast()">+ Add Yeast</button>
+        </div>
+        <div>
+          <h3>Hops</h3>
+          <div id="hops"></div>
+          <button class="add-btn" onclick="addHop()">+ Add Hop</button>
+        </div>
+        <div>
+          <h3>Add-ins</h3>
+          <div id="addInsList"></div>
+          <button class="add-btn" onclick="addAddIn()">+ Add Add-in</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Notes -->
+    <section class="recipe-meta">
+      <h2>Notes</h2>
+      <textarea id="notes" rows="4" placeholder="Example: Try dry hopping next time..."></textarea>
+    </section>
+
+    <!-- Actions -->
+    <section class="recipe-meta">
+      <h2>Actions</h2>
+      <div class="button-row">
+        <button onclick="saveNewRecipe()">Save Recipe</button>
+        <button onclick="updateRecipe()">Update Recipe</button>
+        <button onclick="clearForm()">Clear</button>
+      </div>
+    </section>
+
+    <!-- Recipe List -->
+    <section class="recipe-meta">
+      <h2>Saved Recipes</h2>
+      <div id="recipeList"></div>
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
