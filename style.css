@@ -71,6 +71,7 @@ label {
   padding: 0.6rem 0.8rem;
   font-size: 1rem;
   border: none;
+  border-radius: none;
   /*border-bottom: 0.85px solid #134f5d;*/
   background: #feeee6;
 }
